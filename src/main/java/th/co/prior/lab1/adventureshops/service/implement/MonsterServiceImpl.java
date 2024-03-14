@@ -58,16 +58,16 @@ public class MonsterServiceImpl implements MonsterService {
     }
 
     @Override
-    public ResponseModel<String> attackMonster(Integer characterId, String monsterName, Integer damage) {
+    public ResponseModel<String> attackMonster(Integer playerId, String monsterName, Integer damage) {
         ResponseModel<String> result = new ResponseModel<>();
         try {
-            PlayerEntity character = playerService.getPlayerById(characterId).getData();
+            PlayerEntity player = playerService.getPlayerById(playerId).getData();
             Optional<MonsterEntity> optionalMonster = monsterRepository.findMonsterByName(monsterName);
 
-            if (optionalMonster.isPresent() && character != null) {
+            if (optionalMonster.isPresent() && player != null) {
                 MonsterEntity monster = optionalMonster.get();
                 if (monster.getHealth() < damage) {
-                    inventoryService.addInventory(monster.getItemDrop(), character.getId(), monster.getId());
+                    inventoryService.addInventory(monster.getItemDrop(), player.getId(), monster.getId());
 
                     result.setStatus(200);
                     result.setDescription("OK");
