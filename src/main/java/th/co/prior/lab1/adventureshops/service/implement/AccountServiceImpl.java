@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.entity.AccountEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.repository.AccountRepository;
 import th.co.prior.lab1.adventureshops.service.AccountService;
 
@@ -18,8 +18,8 @@ public class AccountServiceImpl implements AccountService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountRepository accountRepository;
     @Override
-    public ResponseModel<List<AccountEntity>> getAllAccounts() {
-        ResponseModel<List<AccountEntity>> result = new ResponseModel<>();
+    public ApiResponse<List<AccountEntity>> getAllAccounts() {
+        ApiResponse<List<AccountEntity>> result = new ApiResponse<>();
         try {
             List<AccountEntity> accounts = this.accountRepository.findAll();
             if (!accounts.isEmpty()) {

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
 import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.repository.InventoryRepository;
 import th.co.prior.lab1.adventureshops.service.InventoryService;
 
@@ -24,8 +24,8 @@ public class InventoryServiceImpl implements InventoryService {
     private final MonsterServiceImpl monsterService;
 
     @Override
-    public ResponseModel<List<InventoryEntity>> getAllInventories() {
-        ResponseModel<List<InventoryEntity>> result = new ResponseModel<>();
+    public ApiResponse<List<InventoryEntity>> getAllInventories() {
+        ApiResponse<List<InventoryEntity>> result = new ApiResponse<>();
         try {
             List<InventoryEntity> inventories = this.inventoryRepository.findAll();
             if (!inventories.isEmpty()) {
@@ -44,8 +44,8 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public ResponseModel<InventoryEntity> getInventoryById(Integer id) {
-        ResponseModel<InventoryEntity> result = new ResponseModel<>();
+    public ApiResponse<InventoryEntity> getInventoryById(Integer id) {
+        ApiResponse<InventoryEntity> result = new ApiResponse<>();
         try {
             InventoryEntity inventory = this.inventoryRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Inventory not found!"));
@@ -61,10 +61,10 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public void addInventory(String name, Integer characterId, Integer monsterId) {
-        ResponseModel<String> result = new ResponseModel<>();
+        ApiResponse<String> result = new ApiResponse<>();
         try {
-            ResponseModel<PlayerEntity> characterResponse = playerService.getPlayerById(characterId);
-            ResponseModel<MonsterEntity> monsterResponse = monsterService.getMonsterById(monsterId);
+            ApiResponse<PlayerEntity> characterResponse = playerService.getPlayerById(characterId);
+            ApiResponse<MonsterEntity> monsterResponse = monsterService.getMonsterById(monsterId);
 
             PlayerEntity character = characterResponse.getData();
             MonsterEntity monster = monsterResponse.getData();

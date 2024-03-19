@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.InboxEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.repository.InboxRepository;
 import th.co.prior.lab1.adventureshops.service.InboxService;
 
@@ -23,8 +23,8 @@ public class InboxServiceImpl implements InboxService {
     private final PlayerServiceImpl playerService;
 
     @Override
-    public ResponseModel<List<InboxEntity>> getAllInboxes() {
-        ResponseModel<List<InboxEntity>> result = new ResponseModel<>();
+    public ApiResponse<List<InboxEntity>> getAllInboxes() {
+        ApiResponse<List<InboxEntity>> result = new ApiResponse<>();
         try {
             List<InboxEntity> inboxes = this.inboxRepository.findAll();
             if (!inboxes.isEmpty()) {
@@ -46,7 +46,7 @@ public class InboxServiceImpl implements InboxService {
     @Override
     public void addInbox(Integer id, String message) {
         try {
-            ResponseModel<PlayerEntity> playerResponse = playerService.getPlayerById(id);
+            ApiResponse<PlayerEntity> playerResponse = playerService.getPlayerById(id);
             PlayerEntity character = playerResponse.getData();
             if (Objects.nonNull(character)) {
                 InboxEntity inbox = new InboxEntity();

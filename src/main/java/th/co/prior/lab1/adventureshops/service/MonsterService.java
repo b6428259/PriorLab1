@@ -1,15 +1,15 @@
 package th.co.prior.lab1.adventureshops.service;
 
 import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 
 import java.util.List;
 
 public interface MonsterService {
 
-    ResponseModel<List<MonsterEntity>> getAllMonsters();
+    ApiResponse<List<MonsterEntity>> getAllMonsters();
 
-    ResponseModel<MonsterEntity> getMonsterById(Integer id);
+    ApiResponse<MonsterEntity> getMonsterById(Integer id);
 
-    ResponseModel<String> attackMonster(Integer characterId, String monsterName, Integer damage);
+    ApiResponse<String> attackMonster(Integer characterId, String monsterName, Integer damage);
 }

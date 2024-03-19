@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.service.InventoryService;
 
 
@@ -21,14 +21,14 @@ public class InventoryController {
     private final InventoryService inventoryService;
 
     @GetMapping
-    public ResponseEntity<ResponseModel<List<InventoryEntity>>> getAllInventory() {
-        ResponseModel<List<InventoryEntity>> response = inventoryService.getAllInventories();
+    public ResponseEntity<ApiResponse<List<InventoryEntity>>> getAllInventory() {
+        ApiResponse<List<InventoryEntity>> response = inventoryService.getAllInventories();
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseModel<InventoryEntity>> getInventoryById(@PathVariable Integer id) {
-        ResponseModel<InventoryEntity> response = inventoryService.getInventoryById(id);
+    public ResponseEntity<ApiResponse<InventoryEntity>> getInventoryById(@PathVariable Integer id) {
+        ApiResponse<InventoryEntity> response = inventoryService.getInventoryById(id);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

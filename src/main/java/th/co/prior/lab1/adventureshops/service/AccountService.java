@@ -3,12 +3,12 @@ package th.co.prior.lab1.adventureshops.service;
 
 
 import th.co.prior.lab1.adventureshops.entity.AccountEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 
 import java.util.List;
 
 public interface AccountService {
-    ResponseModel<List<AccountEntity>> getAllAccounts();
+    ApiResponse<List<AccountEntity>> getAllAccounts();
 
     void depositBalance(Integer id, double balance);
 

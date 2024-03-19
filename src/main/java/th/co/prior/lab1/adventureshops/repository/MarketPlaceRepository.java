@@ -7,6 +7,6 @@ import th.co.prior.lab1.adventureshops.entity.MarketPlaceEntity;
 import java.util.Optional;
 
 @Repository
-public interface MarketPlaceRepository extends JpaRepository<MarketPlaceEntity,Integer> {
-    Optional<MarketPlaceEntity> findMarketPlaceByInventoryId(Integer id);
-}
+    public interface MarketPlaceRepository extends JpaRepository<MarketPlaceEntity,Integer> {
+        Optional<MarketPlaceEntity> findMarketPlaceByInventoryId(Integer id);
+    }

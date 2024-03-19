@@ -5,12 +5,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.repository.MonsterRepository;
 import th.co.prior.lab1.adventureshops.service.MonsterService;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -21,8 +20,8 @@ public class MonsterServiceImpl implements MonsterService {
     private final PlayerServiceImpl playerService;
     private final InventoryServiceImpl inventoryService;
     @Override
-    public ResponseModel<List<MonsterEntity>> getAllMonsters() {
-        ResponseModel<List<MonsterEntity>> result = new ResponseModel<>();
+    public ApiResponse<List<MonsterEntity>> getAllMonsters() {
+        ApiResponse<List<MonsterEntity>> result = new ApiResponse<>();
         try {
             List<MonsterEntity> monsters = monsterRepository.findAll();
             if (!monsters.isEmpty()) {
@@ -42,8 +41,8 @@ public class MonsterServiceImpl implements MonsterService {
     }
 
     @Override
-    public ResponseModel<MonsterEntity> getMonsterById(Integer id) {
-        ResponseModel<MonsterEntity> result = new ResponseModel<>();
+    public ApiResponse<MonsterEntity> getMonsterById(Integer id) {
+        ApiResponse<MonsterEntity> result = new ApiResponse<>();
         try {
             MonsterEntity monster = monsterRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Monster not found!"));
@@ -58,8 +57,8 @@ public class MonsterServiceImpl implements MonsterService {
     }
 
     @Override
-    public ResponseModel<String> attackMonster(Integer playerId, String monsterName, Integer damage) {
-        ResponseModel<String> result = new ResponseModel<>();
+    public ApiResponse<String> attackMonster(Integer playerId, String monsterName, Integer damage) {
+        ApiResponse<String> result = new ApiResponse<>();
         try {
             PlayerEntity player = playerService.getPlayerById(playerId).getData();
             Optional<MonsterEntity> optionalMonster = monsterRepository.findMonsterByName(monsterName);

@@ -3,7 +3,7 @@ package th.co.prior.lab1.adventureshops.service.implement;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
-import th.co.prior.lab1.adventureshops.model.ResponseModel;
+import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.repository.PlayerRepository;
 import th.co.prior.lab1.adventureshops.service.PlayerService;
 
@@ -17,8 +17,8 @@ public class PlayerServiceImpl implements PlayerService {
     private final PlayerRepository playerRepository;
 
     @Override
-    public ResponseModel<List<PlayerEntity>> getAllPlayers() {
-        ResponseModel<List<PlayerEntity>> result = new ResponseModel<>();
+    public ApiResponse<List<PlayerEntity>> getAllPlayers() {
+        ApiResponse<List<PlayerEntity>> result = new ApiResponse<>();
 
         try {
             List<PlayerEntity> players = playerRepository.findAll();
@@ -39,8 +39,8 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public ResponseModel<PlayerEntity> getPlayerById(Integer id) {
-        ResponseModel<PlayerEntity> result = new ResponseModel<>();
+    public ApiResponse<PlayerEntity> getPlayerById(Integer id) {
+        ApiResponse<PlayerEntity> result = new ApiResponse<>();
 
 
         try {

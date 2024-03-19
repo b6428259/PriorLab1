@@ -22,6 +22,7 @@ public class MonsterEntity {
     @Column(name = "health")
     private Integer health;
 
+
     @Column(name = "item_drop")
     private String itemDrop;
 
