@@ -31,4 +31,6 @@ public class InventoryEntity {
     @OneToMany(mappedBy = "inventory")
     private Set<MarketPlaceEntity> marketPlace;
 
+    @Column(name = "on_market", columnDefinition = "boolean default false")
+    private boolean onMarket;
 }

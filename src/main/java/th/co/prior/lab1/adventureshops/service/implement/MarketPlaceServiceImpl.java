@@ -1,47 +1,55 @@
 package th.co.prior.lab1.adventureshops.service.implement;
 
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
+import th.co.prior.lab1.adventureshops.dto.*;
+import th.co.prior.lab1.adventureshops.entity.AccountEntity;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
 import th.co.prior.lab1.adventureshops.entity.MarketPlaceEntity;
+import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
+import th.co.prior.lab1.adventureshops.exception.*;
 import th.co.prior.lab1.adventureshops.model.ApiResponse;
+import th.co.prior.lab1.adventureshops.model.InventoryModel;
+import th.co.prior.lab1.adventureshops.model.MarketPlaceModel;
 import th.co.prior.lab1.adventureshops.repository.MarketPlaceRepository;
 import th.co.prior.lab1.adventureshops.service.MarketPlaceService;
 
-import java.util.List;
 
+import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class MarketPlaceServiceImpl implements MarketPlaceService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MarketPlaceServiceImpl.class);
+    private final EntityDTO entityDTO;
     private final MarketPlaceRepository marketPlaceRepository;
-    private final PlayerServiceImpl playerService;
-    private final InventoryServiceImpl inventoryService;
-    private final InboxServiceImpl inboxService;
-    private final AccountServiceImpl accountService;
+    private final MarketDto marketDto;
+    private final PlayerDTO playerDTO;
+    private final InventoryDto inventoryDto;
+    private final InboxDto inboxDto;
+    private final AccountDto accountDto;
 
     @Override
-    public ApiResponse<List<MarketPlaceEntity>> getAllMarketPlaces() {
-        ApiResponse<List<MarketPlaceEntity>> result = new ApiResponse<>();
+    public ApiResponse<List<MarketPlaceModel>> getAllMarkerPlace() {
+        ApiResponse<List<MarketPlaceModel>> result = new ApiResponse<>();
+        result.setStatus(404);
+        result.setMessage("Not Found!");
 
         try {
-            List<MarketPlaceEntity> marketPlaces = marketPlaceRepository.findAll();
+            List<MarketPlaceEntity> marketPlaces = this.marketPlaceRepository.findAll();
 
-            if (!marketPlaces.isEmpty()) {
+            if (marketPlaces.iterator().hasNext()) {
                 result.setStatus(200);
-                result.setDescription("OK");
-                result.setData(marketPlaces);
+                result.setMessage("OK");
+                result.setDescription("Successfully retrieved markets information.");
+                result.setData(this.marketDto.toDTOList(marketPlaces));
             } else {
-                result.setStatus(404);
-                result.setDescription("Not Found");
+                throw new NullPointerException();
             }
+        } catch (NullPointerException e){
+            result.setDescription("Marketplace not found!");
         } catch (Exception e) {
-            LOGGER.error("Error while fetching all market places: {}", e.getMessage());
             result.setStatus(500);
             result.setDescription(e.getMessage());
         }
@@ -50,19 +58,23 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
     }
 
     @Override
-    public ApiResponse<MarketPlaceEntity> getMarketPlaceById(Integer id) {
-        ApiResponse<MarketPlaceEntity> result = new ApiResponse<>();
+    public ApiResponse<MarketPlaceModel> getMarketPlaceById(Integer id) {
+        ApiResponse<MarketPlaceModel> result = new ApiResponse<>();
+        result.setStatus(404);
+        result.setMessage("Not Found!");
 
         try {
-            MarketPlaceEntity marketPlace = marketPlaceRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Market Place not found!"));
+            MarketPlaceEntity marketPlaces = this.marketPlaceRepository.findById(id).orElseThrow(() -> new NullPointerException("Marketplace not found!"));
 
             result.setStatus(200);
-            result.setDescription("OK");
-            result.setData(marketPlace);
+            result.setMessage("OK");
+            result.setDescription("Successfully retrieved market information.");
+            result.setData(this.marketDto.toDTO(marketPlaces));
+        } catch (NullPointerException e){
+            result.setDescription(e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error while fetching market place by id {}: {}", id, e.getMessage());
             result.setStatus(500);
+            result.setMessage("Internal Server Error");
             result.setDescription(e.getMessage());
         }
 
@@ -70,116 +82,147 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
     }
 
     @Override
-    public void addMarketPlace(Integer characterId, Integer inventoryId, double price) {
-        try {
-            PlayerEntity character = playerService.getPlayerById(characterId).getData();
-            InventoryEntity inventory = inventoryService.getInventoryById(inventoryId).getData();
+    public ApiResponse<InventoryModel> buyItem(Integer playerId, Integer itemId) {
+        ApiResponse<InventoryModel> result = new ApiResponse<>();
 
-            if (character != null && inventory != null) {
-                MarketPlaceEntity marketPlace = new MarketPlaceEntity();
-                marketPlace.setPlayer(character);
-                marketPlace.setInventory(inventory);
-                marketPlace.setCost(price);
-                marketPlace.setSold(false);
-                marketPlaceRepository.save(marketPlace);
+
+        try {
+            MarketPlaceEntity marketPlaces = this.marketDto.findMarketPlaceById(itemId);
+            if (marketPlaces == null) {
+                throw new MarketItemNotFoundException("Market item not found with ID: " + itemId);
             }
-        } catch (Exception e) {
-            LOGGER.error("Error while adding market place: {}", e.getMessage());
-        }
-    }
 
-    @Override
-    public ApiResponse<String> sellItem(Integer characterId, Integer itemId, double price) {
-        ApiResponse<String> result = new ApiResponse<>();
-
-        try {
-            PlayerEntity character = playerService.getPlayerById(characterId).getData();
-            InventoryEntity inventory = inventoryService.getInventoryById(itemId).getData();
-
-            if (character != null && inventory != null && inventory.getPlayer().equals(character)) {
-                List<MarketPlaceEntity> marketPlaces = marketPlaceRepository.findAll();
-
-                if (checkItemIdIsNotEquals(marketPlaces, inventory)) {
-                    addMarketPlace(characterId, itemId, price);
-
-                    inboxService.addInbox(
-                            characterId,
-                            "Your " + inventory.getName() + " has been added to the market.");
-
-                    result.setStatus(200);
-                    result.setDescription("OK");
-                    result.setData("Item successfully added to the market.");
-                } else {
-                    result.setStatus(400);
-                    result.setDescription("Bad Request");
-                    result.setData("Item is already listed on the market.");
-                }
-            } else {
-                result.setStatus(404);
-                result.setDescription("Not Found");
-                result.setData("Character or item not found.");
+            PlayerEntity player = this.playerDTO.findPlayerById(playerId);
+            if (player == null) {
+                throw new PlayerNotFoundException("Player not found with ID: " + playerId);
             }
-        } catch (Exception e) {
-            LOGGER.error("Error while selling item: {}", e.getMessage());
-            result.setStatus(500);
-            result.setDescription(e.getMessage());
-        }
 
-        return result;
-    }
+            InventoryEntity inventory = this.inventoryDto.findInventoryById(marketPlaces.getInventory().getId());
+            if (inventory == null) {
+                throw new InventoryItemNotFoundException("Inventory item not found with ID: " + marketPlaces.getInventory().getId());
+            }
 
-    @Override
-    public ApiResponse<String> buyItem(Integer characterId, Integer itemId, double price) {
-        ApiResponse<String> result = new ApiResponse<>();
+            AccountEntity account = this.accountDto.findAccountById(player.getAccount().getId());
+            if (account == null) {
+                throw new AccountNotFoundException("Account not found for player with ID: " + playerId);
+            }
 
-        try {
-            MarketPlaceEntity marketPlace = getMarketPlaceById(itemId).getData();
-            PlayerEntity character = playerService.getPlayerById(characterId).getData();
+            if (this.entityDTO.hasEntity(player, inventory)) {
+                if (!marketPlaces.isSold()) {
+                    if (marketPlaces.getCost() <= account.getBalance()) {
+                        this.accountDto.depositBalance(marketPlaces.getPlayer().getId(), marketPlaces.getCost());
+                        this.accountDto.withdrawBalance(player.getId(), marketPlaces.getCost());
 
-            if (marketPlace != null && character != null) {
-                if (!marketPlace.isSold()) {
-                    if (marketPlace.getCost() <= price) {
-                        accountService.depositBalance(marketPlace.getPlayer().getId(), price);
-                        accountService.withdrawBalance(characterId, price);
+                        this.inventoryDto.changeOwner(player, inventory);
+                        this.inventoryDto.setOnMarket(inventory, false);
 
-                        inventoryService.changeOwner(character, marketPlace.getInventory());
+                        marketPlaces.setSold(true);
+                        this.marketPlaceRepository.save(marketPlaces);
 
-                        marketPlace.setSold(true);
-                        marketPlaceRepository.save(marketPlace);
-
-                        inboxService.addInbox(
-                                marketPlace.getPlayer().getId(),
-                                "Your " + marketPlace.getInventory().getName() + " has been sold.");
+                        this.inboxDto.addInbox(
+                                marketPlaces.getPlayer().getId(),
+                                "Your " + marketPlaces.getInventory().getName() + " has been sold.");
 
                         result.setStatus(200);
-                        result.setDescription("OK");
-                        result.setData("Successfully purchased a " + marketPlace.getInventory().getName() + ".");
+                        result.setMessage("OK");
+                        result.setDescription("Successfully purchased a " + marketPlaces.getInventory().getName() + ".");
+                        result.setData(this.inventoryDto.toDTO(inventory));
                     } else {
-                        result.setStatus(400);
-                        result.setDescription("Bad Request");
-                        result.setData("Insufficient balance to purchase " + marketPlace.getInventory().getName());
+                        throw new InsufficientFundsException("Your balance is insufficient.");
                     }
                 } else {
-                    result.setStatus(400);
-                    result.setDescription("Bad Request");
-                    result.setData("The " + marketPlace.getInventory().getName() + " has already been sold.");
+                    throw new ItemAlreadySoldException("The " + marketPlaces.getInventory().getName() + " has already been sold.");
                 }
             } else {
-                result.setStatus(404);
-                result.setDescription("Not Found");
-                result.setData("Market place or character not found.");
+                throw new UnauthorizedAccessException("You are not authorized to purchase this item.");
             }
-
+        } catch (MarketItemNotFoundException | PlayerNotFoundException | InventoryItemNotFoundException | AccountNotFoundException | InsufficientFundsException | ItemAlreadySoldException | UnauthorizedAccessException e) {
+            result.setStatus(400);
+            result.setMessage("Bad Request");
+            result.setDescription(e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error while buying item: {}", e.getMessage());
             result.setStatus(500);
+            result.setMessage("Internal Server Error");
             result.setDescription(e.getMessage());
         }
 
         return result;
     }
 
-    private boolean checkItemIdIsNotEquals(List<MarketPlaceEntity> market, InventoryEntity inventory) {
-        return market.stream().noneMatch(e -> e.getInventory().getId().equals(inventory.getId()));
+
+    @Override
+    public ApiResponse<MarketPlaceModel> sellItem(Integer playerId, Integer itemId, double price) {
+        ApiResponse<MarketPlaceModel> result = new ApiResponse<>();
+        result.setStatus(400);
+        result.setMessage("Bad Request");
+
+        try {
+            PlayerEntity player = this.playerDTO.findPlayerById(playerId);
+            if (player == null) {
+                throw new PlayerNotFoundException("Player not found with ID: " + playerId);
+            }
+
+            InventoryEntity inventory = this.inventoryDto.findInventoryById(itemId);
+            if (inventory == null) {
+                throw new InventoryItemNotFoundException("Inventory item not found with ID: " + itemId);
+            }
+
+            MarketPlaceEntity marketPlaces = this.marketDto.findMarketPlaceByInventoryId(inventory.getId());
+            if (this.marketDto.hasOwner(player, inventory)) {
+                if (this.marketDto.checkItemIdIsNotEquals(marketPlaces, inventory)) {
+                    this.marketDto.addMarketPlace(player.getId(), inventory.getId(), price);
+                    this.inboxDto.addInbox(
+                            playerId,
+                            "Your " + inventory.getName() + " has been added to the market.");
+
+                    result.setStatus(201);
+                    result.setMessage("Created");
+                    result.setDescription("You have successfully added a " + inventory.getName() + " to your inventory.");
+                    result.setData(this.marketDto.toDTO(
+                            this.marketDto.findMarketPlaceByInventoryId(inventory.getId())));
+                } else {
+                    result.setStatus(400);
+                    result.setMessage("Bad Request");
+                    result.setDescription("You already have " + inventory.getName() + " on the market.");
+                }
+            } else {
+                throw new UnauthorizedAccessException("Player is not the owner of the inventory item.");
+            }
+        } catch (PlayerNotFoundException | InventoryItemNotFoundException | UnauthorizedAccessException e) {
+            result.setStatus(400);
+            result.setMessage("Bad Request");
+            result.setDescription(e.getMessage());
+        } catch (Exception e) {
+            result.setStatus(500);
+            result.setMessage("Internal Server Error");
+            result.setDescription(e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
+    public ApiResponse<MarketPlaceModel> deleteMarketPlace(Integer id) {
+        ApiResponse<MarketPlaceModel> result = new ApiResponse<>();
+        result.setStatus(400);
+        result.setMessage("Bad Request");
+
+        try {
+            this.marketPlaceRepository.findById(id).orElseThrow(() -> new NullPointerException("Marketplace not found!"));
+            this.marketPlaceRepository.deleteById(id);
+
+            result.setStatus(200);
+            result.setMessage("OK");
+            result.setDescription("Market data has been deleted.");
+            result.setData(null);
+        } catch (NullPointerException e){
+            result.setDescription(e.getMessage());
+        } catch (Exception e) {
+            result.setStatus(500);
+            result.setMessage("Internal Server Error");
+            result.setDescription(e.getMessage());
+        }
+
+        return result;
     }
 }

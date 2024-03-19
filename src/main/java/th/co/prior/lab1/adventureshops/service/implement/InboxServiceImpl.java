@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import th.co.prior.lab1.adventureshops.dto.InboxDto;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.InboxEntity;
 import th.co.prior.lab1.adventureshops.model.ApiResponse;
+import th.co.prior.lab1.adventureshops.model.InboxModel;
+import th.co.prior.lab1.adventureshops.model.PlayerModel;
 import th.co.prior.lab1.adventureshops.repository.InboxRepository;
 import th.co.prior.lab1.adventureshops.service.InboxService;
 
@@ -18,44 +21,68 @@ import java.util.Objects;
 @AllArgsConstructor
 public class InboxServiceImpl implements InboxService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InboxServiceImpl.class);
     private final InboxRepository inboxRepository;
-    private final PlayerServiceImpl playerService;
+    private final InboxDto inboxDto;
 
     @Override
-    public ApiResponse<List<InboxEntity>> getAllInboxes() {
-        ApiResponse<List<InboxEntity>> result = new ApiResponse<>();
+    public ApiResponse<List<InboxModel>> getAllInbox() {
+        ApiResponse<List<InboxModel>> result = new ApiResponse<>();
+        result.setStatus(404);
+        result.setMessage("Not Found");
+
         try {
             List<InboxEntity> inboxes = this.inboxRepository.findAll();
-            if (!inboxes.isEmpty()) {
+
+            if (inboxes.iterator().hasNext()) {
                 result.setStatus(200);
-                result.setDescription("List of all Inbox retrieved successfully.");
-                result.setData(inboxes);
+                result.setMessage("OK");
+                result.setDescription("Successfully retrieved inboxes information.");
+                result.setData(this.inboxDto.toDTOList(inboxes));
             } else {
-                result.setStatus(404);
-                result.setDescription("No Inbox Found!");
+                throw new NullPointerException();
             }
+        } catch (NullPointerException e) {
+            result.setDescription("Inbox not found!");
         } catch (Exception e) {
             result.setStatus(500);
+            result.setMessage("Internal Server Error");
             result.setDescription(e.getMessage());
         }
+
         return result;
     }
 
+    @Override
+    public ApiResponse<InboxModel> getInboxById(Integer id) {
+        ApiResponse<InboxModel> result = new ApiResponse<>();
+        result.setStatus(404);
+        result.setMessage("Not Found");
+
+        try {
+            InboxEntity inboxes = this.inboxRepository.findById(id).orElseThrow(() -> new NullPointerException("Inbox not found!"));
+
+            result.setStatus(200);
+            result.setMessage("OK");
+            result.setDescription("Successfully retrieved inboxes information.");
+            result.setData(this.inboxDto.toDTO(inboxes));
+        } catch (NullPointerException e) {
+            result.setDescription(e.getMessage());
+        } catch (Exception e) {
+            result.setStatus(500);
+            result.setMessage("Internal Server Error");
+            result.setDescription(e.getMessage());
+        }
+
+        return result;
+    }
 
     @Override
-    public void addInbox(Integer id, String message) {
-        try {
-            ApiResponse<PlayerEntity> playerResponse = playerService.getPlayerById(id);
-            PlayerEntity character = playerResponse.getData();
-            if (Objects.nonNull(character)) {
-                InboxEntity inbox = new InboxEntity();
-                inbox.setPlayer(character);
-                inbox.setMessage(message);
-                this.inboxRepository.save(inbox);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error adding inbox for player with id {}: {}", id, e.getMessage());
-        }
+    public ApiResponse<InboxModel> createInbox(Integer characterId, String message) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse<InboxModel> updateInbox(Integer id, String message) {
+        return null;
     }
 }

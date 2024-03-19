@@ -8,5 +8,5 @@ public class ApiResponse<T> {
     private Integer status;
     private String description;
     private T data;
-
+    private String message;
 }

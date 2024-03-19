@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import th.co.prior.lab1.adventureshops.dto.MonsterDTO;
+import th.co.prior.lab1.adventureshops.dto.PlayerDTO;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
 import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
@@ -22,6 +24,8 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final PlayerServiceImpl playerService;
     private final MonsterServiceImpl monsterService;
+    private final PlayerDTO playerDto;
+    private MonsterDTO monsterDto;
 
     @Override
     public ApiResponse<List<InventoryEntity>> getAllInventories() {
@@ -60,14 +64,12 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public void addInventory(String name, Integer characterId, Integer monsterId) {
+    public void addInventory(String name, Integer playerId, Integer monsterId) {
         ApiResponse<String> result = new ApiResponse<>();
         try {
-            ApiResponse<PlayerEntity> characterResponse = playerService.getPlayerById(characterId);
-            ApiResponse<MonsterEntity> monsterResponse = monsterService.getMonsterById(monsterId);
 
-            PlayerEntity character = characterResponse.getData();
-            MonsterEntity monster = monsterResponse.getData();
+            PlayerEntity character = this.playerDto.findPlayerById(playerId);
+            MonsterEntity monster = this.monsterDto.findMonsterById(monsterId);
 
             if (character != null && monster != null) {
                 InventoryEntity inventory = new InventoryEntity();

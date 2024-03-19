@@ -27,6 +27,6 @@ public class MonsterEntity {
     private String itemDrop;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "monster")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "monster", cascade = CascadeType.ALL)
     private Set<InventoryEntity> itemId;
 }
