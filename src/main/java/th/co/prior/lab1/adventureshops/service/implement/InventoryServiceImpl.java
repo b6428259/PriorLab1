@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import th.co.prior.lab1.adventureshops.dto.MonsterDTO;
-import th.co.prior.lab1.adventureshops.dto.PlayerDTO;
+import th.co.prior.lab1.adventureshops.dto.MonsterDto;
+import th.co.prior.lab1.adventureshops.dto.PlayerDto;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
 import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
@@ -24,8 +24,8 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final PlayerServiceImpl playerService;
     private final MonsterServiceImpl monsterService;
-    private final PlayerDTO playerDto;
-    private MonsterDTO monsterDto;
+    private final PlayerDto playerDto;
+    private MonsterDto monsterDto;
 
     @Override
     public ApiResponse<List<InventoryEntity>> getAllInventories() {

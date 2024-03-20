@@ -44,16 +44,6 @@ public class MonsterController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse<MonsterModel>> updateMonster(
-            @PathVariable Integer id,
-            @RequestParam String name,
-            @RequestParam Integer health,
-            @RequestParam String dropItem
-    ) {
-        ApiResponse<MonsterModel> response = monsterService.updateMonster(id, name, health, dropItem);
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
 
     @PostMapping("/attack")
     public ResponseEntity<ApiResponse<MonsterModel>> attackMonster(@RequestBody Map<String, Integer> requestBody) {

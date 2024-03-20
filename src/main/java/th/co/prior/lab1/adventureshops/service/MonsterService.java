@@ -1,6 +1,6 @@
 package th.co.prior.lab1.adventureshops.service;
 
-import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
+
 import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.model.MonsterModel;
 
@@ -15,7 +15,6 @@ public interface MonsterService {
     ApiResponse<MonsterModel> createMonster(String name, Integer maxHealth, String dropItem);
 
 
-    ApiResponse<MonsterModel> updateMonster(Integer id, String name, Integer maxHealth, String dropItem);
 
 
     ApiResponse<MonsterModel> attackMonster(Integer playerId, Integer monsterId);

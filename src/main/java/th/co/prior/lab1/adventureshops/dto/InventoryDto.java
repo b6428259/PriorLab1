@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 public class InventoryDto {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryDto.class);
-    private final EntityDTO entityDTO;
-    private final MonsterDTO monsterDTO;
-    private final PlayerDTO playerDTO;
+    private final EntityDto entityDTO;
+    private final MonsterDto monsterDTO;
+    private final PlayerDto playerDTO;
     private final InventoryRepository inventoryRepository;
 
     public List<InventoryModel> toDTOList(List<InventoryEntity> inventory) {

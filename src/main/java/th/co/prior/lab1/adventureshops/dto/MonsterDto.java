@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
-public class MonsterDTO {
+public class MonsterDto {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MonsterDTO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MonsterDto.class);
     private final MonsterRepository monsterRepository;
 
     public List<MonsterModel> toDTOList(List<MonsterEntity> monster) {

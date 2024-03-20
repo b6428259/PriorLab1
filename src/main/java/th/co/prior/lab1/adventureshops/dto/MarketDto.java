@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 public class MarketDto {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MarketDto.class);
-    private final EntityDTO entityDTO;
+    private final EntityDto entityDTO;
     private final MarketPlaceRepository marketPlaceRepository;
-    private final PlayerDTO playerDTO;
+    private final PlayerDto playerDTO;
     private final AccountDto accountDto;
     private final InventoryDto inventoryDto;
 

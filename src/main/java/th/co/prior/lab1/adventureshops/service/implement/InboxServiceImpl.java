@@ -3,6 +3,7 @@ package th.co.prior.lab1.adventureshops.service.implement;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.dto.InboxDto;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
@@ -27,24 +28,24 @@ public class InboxServiceImpl implements InboxService {
     @Override
     public ApiResponse<List<InboxModel>> getAllInbox() {
         ApiResponse<List<InboxModel>> result = new ApiResponse<>();
-        result.setStatus(404);
+        result.setStatus(HttpStatus.NOT_FOUND.value());
         result.setMessage("Not Found");
 
         try {
-            List<InboxEntity> inboxes = this.inboxRepository.findAll();
+            List<InboxEntity> inboxes = inboxRepository.findAll();
 
-            if (inboxes.iterator().hasNext()) {
-                result.setStatus(200);
+            if (!inboxes.isEmpty()) {
+                result.setStatus(HttpStatus.OK.value());
                 result.setMessage("OK");
                 result.setDescription("Successfully retrieved inboxes information.");
-                result.setData(this.inboxDto.toDTOList(inboxes));
+                result.setData(inboxDto.toDTOList(inboxes));
             } else {
                 throw new NullPointerException();
             }
         } catch (NullPointerException e) {
             result.setDescription("Inbox not found!");
         } catch (Exception e) {
-            result.setStatus(500);
+            result.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             result.setMessage("Internal Server Error");
             result.setDescription(e.getMessage());
         }
@@ -55,27 +56,27 @@ public class InboxServiceImpl implements InboxService {
     @Override
     public ApiResponse<InboxModel> getInboxById(Integer id) {
         ApiResponse<InboxModel> result = new ApiResponse<>();
-        result.setStatus(404);
+        result.setStatus(HttpStatus.NOT_FOUND.value());
         result.setMessage("Not Found");
 
         try {
-            InboxEntity inboxes = this.inboxRepository.findById(id).orElseThrow(() -> new NullPointerException("Inbox not found!"));
+            InboxEntity inbox = inboxRepository.findById(id)
+                    .orElseThrow(() -> new NullPointerException("Inbox not found!"));
 
-            result.setStatus(200);
+            result.setStatus(HttpStatus.OK.value());
             result.setMessage("OK");
-            result.setDescription("Successfully retrieved inboxes information.");
-            result.setData(this.inboxDto.toDTO(inboxes));
+            result.setDescription("Successfully retrieved inbox information.");
+            result.setData(inboxDto.toDTO(inbox));
         } catch (NullPointerException e) {
             result.setDescription(e.getMessage());
         } catch (Exception e) {
-            result.setStatus(500);
+            result.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             result.setMessage("Internal Server Error");
             result.setDescription(e.getMessage());
         }
 
         return result;
     }
-
     @Override
     public ApiResponse<InboxModel> createInbox(Integer characterId, String message) {
         return null;

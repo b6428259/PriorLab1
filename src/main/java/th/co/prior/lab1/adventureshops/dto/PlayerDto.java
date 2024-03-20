@@ -14,14 +14,13 @@ import th.co.prior.lab1.adventureshops.service.LevelService;
 
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
-public class PlayerDTO {
+public class PlayerDto {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlayerDTO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlayerDto.class);
     private final PlayerRepository playerRepository;
     private final LevelService levelService;
 

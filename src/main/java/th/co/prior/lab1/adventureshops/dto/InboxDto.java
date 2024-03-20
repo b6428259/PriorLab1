@@ -12,7 +12,6 @@ import th.co.prior.lab1.adventureshops.model.InboxModel;
 import th.co.prior.lab1.adventureshops.repository.InboxRepository;
 
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +20,8 @@ import java.util.stream.Collectors;
 public class InboxDto {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InboxDto.class);
-    private final EntityDTO entityDTO;
-    private final PlayerDTO playerDTO;
+    private final EntityDto entityDTO;
+    private final PlayerDto playerDTO;
     private final InboxRepository inboxRepository;
 
     public List<InboxModel> toDTOList(List<InboxEntity> inbox) {

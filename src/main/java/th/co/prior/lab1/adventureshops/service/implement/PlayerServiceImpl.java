@@ -3,7 +3,7 @@ package th.co.prior.lab1.adventureshops.service.implement;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.dto.AccountDto;
-import th.co.prior.lab1.adventureshops.dto.PlayerDTO;
+import th.co.prior.lab1.adventureshops.dto.PlayerDto;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.model.PlayerModel;
@@ -20,7 +20,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     private final AccountDto accountUtils;
 
-    private final PlayerDTO playerDTO;
+    private final PlayerDto playerDTO;
     private final PlayerRepository playerRepository;
 
     @Override

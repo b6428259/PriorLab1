@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Component
-public class EntityDTO {
+public class EntityDto {
 
     @SafeVarargs
     public final  <T> boolean hasEntity(T... entities) {

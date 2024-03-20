@@ -1,12 +1,12 @@
 package th.co.prior.lab1.adventureshops.service.implement;
 
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import th.co.prior.lab1.adventureshops.dto.EntityDTO;
+import th.co.prior.lab1.adventureshops.dto.EntityDto;
 import th.co.prior.lab1.adventureshops.dto.InventoryDto;
-import th.co.prior.lab1.adventureshops.dto.MonsterDTO;
-import th.co.prior.lab1.adventureshops.dto.PlayerDTO;
+import th.co.prior.lab1.adventureshops.dto.MonsterDto;
+import th.co.prior.lab1.adventureshops.dto.PlayerDto;
 import th.co.prior.lab1.adventureshops.entity.LevelEntity;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
@@ -16,7 +16,6 @@ import th.co.prior.lab1.adventureshops.repository.MonsterRepository;
 import th.co.prior.lab1.adventureshops.service.LevelService;
 import th.co.prior.lab1.adventureshops.service.MonsterService;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,10 +23,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class MonsterServiceImpl implements MonsterService {
 
-    private final EntityDTO entityDTO;
+    private final EntityDto entityDTO;
     private final MonsterRepository monsterRepository;
-    private final MonsterDTO monsterDTO;
-    private final PlayerDTO playerDTO;
+    private final MonsterDto monsterDTO;
+    private final PlayerDto playerDTO;
     private final InventoryDto inventoryDto;
     private final LevelService levelService;
 
@@ -117,84 +116,48 @@ public class MonsterServiceImpl implements MonsterService {
         return result;
     }
 
-    @Override
-    public ApiResponse<MonsterModel> updateMonster(Integer id, String name, Integer health, String dropItem) {
-        ApiResponse<MonsterModel> result = new ApiResponse<>();
-        result.setStatus(400);
-        result.setMessage("Bad Request");
-
-        try {
-            MonsterEntity monster = this.monsterRepository.findById(id).orElseThrow(() -> new NullPointerException("Monster noy found!"));
-
-            monster.setName(name);
-            monster.setHealth(health);
-            monster.setItemDrop(dropItem);
-            this.monsterRepository.save(monster);
-
-            result.setStatus(200);
-            result.setMessage("OK");
-            result.setDescription("Monster information has been successfully updated.");
-            result.setData(this.monsterDTO.toDTO(monster));
-
-        } catch (NullPointerException e) {
-            result.setDescription(e.getMessage());
-        } catch (Exception e) {
-            result.setStatus(500);
-            result.setMessage("Internal Server Error");
-            result.setDescription(e.getMessage());
-        }
-
-        return result;
-    }
 
 
     @Override
     public ApiResponse<MonsterModel> attackMonster(Integer playerId, Integer monsterId) {
         ApiResponse<MonsterModel> result = new ApiResponse<>();
-        LevelEntity levelEntity = levelService.findById(Long.valueOf(playerDTO.findPlayerById(playerId).getLevelId()));
-        Integer damage = levelEntity.getDamage();
-        result.setStatus(400);
+        result.setStatus(HttpStatus.BAD_REQUEST.value());
         result.setMessage("Bad Request");
 
         try {
-            // Retrieve player and monster entities from the database
+            PlayerEntity player = playerDTO.findPlayerById(playerId);
+            MonsterEntity monster = monsterDTO.findMonsterById(monsterId);
 
-            PlayerEntity player = this.playerDTO.findPlayerById(playerId);
-            MonsterEntity monster = this.monsterDTO.findMonsterById(monsterId);
+            LevelEntity levelEntity = levelService.findById(Long.valueOf(player.getLevelId()));
+            int damage = levelEntity.getDamage();
 
+            if (monster != null && player != null) {
+                if (monster.getHealth() <= damage) {
+                    inventoryDto.addInventory(monster.getItemDrop(), player.getId(), monster.getId());
 
-
-
-                    // Proceed with logic if player's level damage is greater than or equal to monster's health
-                    if (monster.getHealth().intValue() <= damage.intValue()) {
-                        this.inventoryDto.addInventory(monster.getItemDrop(), player.getId(), monster.getId());
-
-                        result.setStatus(200);
-                        result.setMessage("OK");
-                        result.setDescription("You have successfully killed the boss. You have received a " + monster.getItemDrop());
-                        result.setData(this.monsterDTO.toDTO(monster));
-                    } else {
-                        result.setStatus(200);
-                        result.setMessage("OK");
-                        result.setDescription("You have been killed by " + monster.getName() + ". Because the damage is not enough"
-                                +" Your damage is" + damage +" Monster Health is " + monster.getHealth().intValue());
-                        result.setData(this.monsterDTO.toDTO(monster));
-
-                    }
-
-//            } else {
-//                String playerName = (playerId != null) ? "Player: " + playerDTO.findPlayerById(playerId).getName() : "Unknown player";
-//                String monsterName = (monsterId != null) ? "Monster: " + monsterDTO.findMonsterById(monsterId).getName() : "Unknown monster";
-//                // Handle case where player or monster entity is null
-//                result.setDescription("Can't found Character or Monster!" + playerName + ", " + monsterName);
-//            }
+                    result.setStatus(HttpStatus.OK.value());
+                    result.setMessage("OK");
+                    result.setDescription("You have successfully killed the " + monster.getName() +". You have received a " + monster.getItemDrop());
+                    result.setData(monsterDTO.toDTO(monster));
+                } else {
+                    result.setStatus(HttpStatus.OK.value());
+                    result.setMessage("OK");
+                    result.setDescription("You have been killed by " + monster.getName() + ". Because the damage is not enough"
+                            + " Your damage is " + damage + " Monster Health is " + monster.getHealth());
+                    result.setData(monsterDTO.toDTO(monster));
+                }
+            } else {
+                result.setStatus(HttpStatus.NOT_FOUND.value());
+                result.setMessage("Not Found");
+                result.setDescription("Player or monster not found.");
+            }
         } catch (Exception e) {
-            result.setStatus(500);
+            result.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             result.setMessage("Internal Server Error");
             result.setDescription(e.getMessage());
-
         }
 
         return result;
     }
+
 }
