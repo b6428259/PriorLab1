@@ -32,12 +32,6 @@ public class PlayerController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<ApiResponse<PlayerModel>> createPlayer(
-//            @RequestParam String name) {
-//        ApiResponse<PlayerModel> response = playerService.createPlayer(name);
-//        return ResponseEntity.status(response.getStatus()).body(response);
-//    }
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<PlayerModel>> createPlayer(@RequestBody Map<String, Object> request) {
@@ -47,22 +41,6 @@ public class PlayerController {
     }
 
 
-//    @PostMapping("/buy")
-//    public ResponseEntity<ApiResponse<InventoryModel>> buyItem(@RequestBody Map<String, Object> request) {
-//        Integer playerId = (Integer) request.get("playerId");
-//        Integer itemId = (Integer) request.get("itemId");
-//
-//        ApiResponse<InventoryModel> response;
-//        try {
-//            response = marketPlaceService.buyItem(playerId, itemId);
-//        } catch (Exception e) {
-//            response = new ApiResponse<>();
-//            response.setStatus(500);
-//            response.setMessage("Internal Server Error");
-//            response.setDescription(e.getMessage());
-//        }
-//        return ResponseEntity.status(response.getStatus()).body(response);
-//    }
 
 
     @PutMapping("/update/{id}")

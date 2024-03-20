@@ -22,8 +22,8 @@ public class AccountDto {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountDto.class);
     private final AccountRepository accountRepository;
 
-    public List<AccountModel> toDTOList(List<AccountEntity> account) {
-        return account.stream()
+    public List<AccountModel> toDTOList(List<AccountEntity> accounts) {
+        return accounts.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -34,11 +34,10 @@ public class AccountDto {
         dto.setBuyerName(account.getPlayer().getName());
         dto.setAccountNum(account.getAccountNumber());
         dto.setBalance(account.getBalance());
-
         return dto;
     }
 
-    public List<AccountEntity> findAllAccount(){
+    public List<AccountEntity> findAllAccounts(){
         return accountRepository.findAll();
     }
 
@@ -46,69 +45,57 @@ public class AccountDto {
         return accountRepository.findById(id).orElse(null);
     }
 
-    public AccountEntity findAccountByCharacterId(Integer characterId){
-        return this.accountRepository.findAccountByPlayerId(characterId).orElse(null);
+    public AccountEntity findAccountByPlayerId(Integer playerId){
+        return accountRepository.findAccountByPlayerId(playerId).orElse(null);
     }
 
-    public void createAccount(PlayerEntity player) {
+    public void createAccount(PlayerEntity player, String accountNumbers) {
         AccountEntity account = new AccountEntity();
-        account.setAccountNumber(this.getAccountNumber());
-        account.setBalance(3000.00);
+        account.setAccountNumber(generateAccountNumber());
+        account.setBalance(5000.00);
         account.setPlayer(player);
-        this.accountRepository.save(account);
-
+        accountRepository.save(account);
     }
 
-    public void depositBalance(Integer id, double balance) {
-        try {
-            AccountEntity account = this.accountRepository.findAccountByPlayerId(id).orElseThrow(() -> new RuntimeException("Can't deposit balance because character not found!"));
-
-            double total = this.formatDecimal(account.getBalance() + balance);
-            account.setBalance(total);
-            this.accountRepository.save(account);
-        } catch (Exception e) {
-            LOGGER.error("error: {}", e.getMessage());
-        }
-    }
-
-    public void withdrawBalance(Integer id, double balance) {
-        try {
-            AccountEntity account = this.accountRepository.findAccountByPlayerId(id).orElseThrow(() -> new RuntimeException("Can't withdraw balance because character not found!"));
-
-            double total = this.formatDecimal(account.getBalance() - balance);
-            account.setBalance(total);
-            this.accountRepository.save(account);
-        } catch (Exception e) {
-            LOGGER.error("error: {}", e.getMessage());
+    public void depositBalance(Integer playerId, double balance) {
+        AccountEntity account = findAccountByPlayerId(playerId);
+        if (account == null) {
+            LOGGER.error("Can't deposit balance because account not found for player with ID: {}", playerId);
+            return;
         }
 
+        double total = formatDecimal(account.getBalance() + balance);
+        account.setBalance(total);
+        accountRepository.save(account);
     }
 
-    public String getAccountNumber(){
-        StringBuilder start = new StringBuilder();
-        Random value = new Random();
+    public void withdrawBalance(Integer playerId, double balance) {
+        AccountEntity account = findAccountByPlayerId(playerId);
+        if (account == null) {
+            LOGGER.error("Can't withdraw balance because account not found for player with ID: {}", playerId);
+            return;
+        }
 
-        int count = 0;
-        int n = 0;
+        double total = formatDecimal(account.getBalance() - balance);
+        account.setBalance(total);
+        accountRepository.save(account);
+    }
+
+    public String generateAccountNumber(){
+        StringBuilder accountNumber = new StringBuilder();
+        Random random = new Random();
 
         for (int i = 0; i < 19; i++) {
-            if (count == 4) {
-                start.append(" ");
-                count = 0;
-            } else {
-                n = value.nextInt(10);
-                start.append(n);
-                count++;
+            if (i > 0 && i % 4 == 0) {
+                accountNumber.append(" ");
             }
+            accountNumber.append(random.nextInt(10));
         }
 
-        return start.toString();
+        return accountNumber.toString();
     }
 
-    public double formatDecimal(double value){
-        DecimalFormat df = new DecimalFormat("#.##");
-        String balance = df.format(value);
-
-        return Double.parseDouble(balance);
+    double formatDecimal(double value){
+        return Math.round(value * 100.0) / 100.0;
     }
 }

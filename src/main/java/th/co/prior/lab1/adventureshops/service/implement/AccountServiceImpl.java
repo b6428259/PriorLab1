@@ -115,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
             if (entityDTO.hasEntity(player)) {
                 if (duplicateAccount.isEmpty()) {
                     AccountEntity account = new AccountEntity();
-                    account.setAccountNumber(accountDTO.getAccountNumber());
+                    account.setAccountNumber(accountDTO.generateAccountNumber());
                     account.setBalance(balance);
                     account.setPlayer(player);
                     AccountEntity saved = accountRepository.save(account);

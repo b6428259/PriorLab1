@@ -35,10 +35,10 @@ public class PlayerDto {
         dto.setId(character.getId());
         dto.setName(character.getName());
         dto.setLevel(Math.toIntExact(character.getLevelId()));
-        // Retrieve the LevelEntity based on levelId
+
         LevelEntity levelEntity = levelService.findById(Long.valueOf(character.getLevelId()));
         if (levelEntity != null) {
-            // Set the damage value from the retrieved LevelEntity
+
             dto.setDamage(levelEntity.getDamage());
         }
         return dto;

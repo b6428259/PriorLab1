@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import th.co.prior.lab1.adventureshops.repository.AccountRepository;
+
 import java.util.Random;
 import java.util.Set;
 
@@ -12,6 +15,9 @@ import java.util.Set;
 @Entity
 @Table(name = "players")
 public class PlayerEntity {
+
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,22 +52,17 @@ public class PlayerEntity {
     @Transient
     private LevelEntity level;
 
+
+
     @PrePersist
     public void prePersist() {
-        if (this.account == null) {
-            this.account = new AccountEntity();
-            this.account.setAccountNumber(generateRandomAccountNumber());
-            this.account.setBalance(5000.0);
-            this.account.setPlayer(this);
+
+        if (this.levelId == null) {
+            this.levelId = 1;
         }
+        this.level = new LevelEntity();
+
     }
 
-    private String generateRandomAccountNumber() {
-        // Generate a random account number using any suitable logic
-        // For example, you can use a combination of letters and numbers
-        // Here's a simple example generating a random 6-digit number as a string
-        Random random = new Random();
-        int randomNumber = 100000 + random.nextInt(900000);
-        return String.valueOf(randomNumber);
-    }
+
 }

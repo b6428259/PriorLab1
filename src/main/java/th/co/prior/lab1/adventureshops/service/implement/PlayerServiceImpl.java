@@ -3,25 +3,29 @@ package th.co.prior.lab1.adventureshops.service.implement;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.dto.AccountDto;
+import th.co.prior.lab1.adventureshops.dto.LevelDto;
 import th.co.prior.lab1.adventureshops.dto.PlayerDto;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import th.co.prior.lab1.adventureshops.model.PlayerModel;
+import th.co.prior.lab1.adventureshops.repository.AccountRepository;
 import th.co.prior.lab1.adventureshops.repository.PlayerRepository;
 import th.co.prior.lab1.adventureshops.service.PlayerService;
 
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @AllArgsConstructor
 public class PlayerServiceImpl implements PlayerService {
 
     private final AccountDto accountUtils;
-
+    private final LevelDto levelDto;
     private final PlayerDto playerDTO;
     private final PlayerRepository playerRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     public ApiResponse<List<PlayerModel>> getAllPlayer() {
@@ -86,9 +90,9 @@ public class PlayerServiceImpl implements PlayerService {
                 if (duplicateCharacter.isEmpty()) {
                     PlayerEntity character = new PlayerEntity();
                     character.setName(name);
-//                   character.setLevel(this.LevelDto.getLevel());
                     PlayerEntity saved = this.playerRepository.save(character);
-                    this.accountUtils.createAccount(character);
+                    String accountNumbers = generateRandomAccountNumber();
+                    this.accountUtils.createAccount(character, accountNumbers);
 
                     result.setStatus(201);
                     result.setMessage("Created");
@@ -143,5 +147,21 @@ public class PlayerServiceImpl implements PlayerService {
         }
 
         return result;
+    }
+
+    private String generateRandomAccountNumber() {
+        String accountNumber;
+        do {
+            // Generate a random account number
+            Random random = new Random();
+            int randomNumber = 100000 + random.nextInt(900000);
+            accountNumber = String.valueOf(randomNumber);
+        } while (accountExists(accountNumber));
+
+        return accountNumber;
+    }
+
+    private boolean accountExists(String accountNumber) {
+        return accountRepository.existsByAccountNumber(accountNumber);
     }
 }
