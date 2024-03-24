@@ -1,0 +1,22 @@
+@startuml
+title getInboxById(id: Integer)
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : GET /api/v1/inbox/{id}
+a->d: findById(Inbox_id)
+a->a : Validate inbox
+
+alt Inbox found
+    d-->a : inbox
+    a->u : 200 OK
+    a->u : "Data retrieved successfully"
+    a->u : JSON Inbox data
+else Inbox not found
+    a->u : 404 Not Found
+    a->u : "Inbox not found"
+end
+
+@enduml

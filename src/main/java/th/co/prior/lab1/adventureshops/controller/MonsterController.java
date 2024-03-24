@@ -49,9 +49,8 @@ public class MonsterController {
     public ResponseEntity<ApiResponse<MonsterModel>> attackMonster(@RequestBody Map<String, Integer> requestBody) {
         Integer playerId = requestBody.get("playerId");
         Integer monsterId = requestBody.get("monsterId");
-    {
         ApiResponse<MonsterModel> response = this.monsterService.attackMonster(playerId , monsterId);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
-}}
+}
 

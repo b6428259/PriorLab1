@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 @Service
 public class LevelService {
-    private LevelRepository repository;
+    private final LevelRepository repository;
 
 
     public void removeAllLevels() {
@@ -27,10 +27,6 @@ public class LevelService {
 
     public List<LevelEntity> retrieveLevel() {
         return (List<LevelEntity>) repository.findAll();
-    }
-
-    public Optional<LevelEntity> retrieveLevel(Long id){
-        return repository.findById(Math.toIntExact(id));
     }
 
     public LevelEntity save(LevelEntity levelEntity) {

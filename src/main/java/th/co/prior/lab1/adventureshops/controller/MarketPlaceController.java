@@ -35,16 +35,7 @@ public class MarketPlaceController {
     public ResponseEntity<ApiResponse<InventoryModel>> buyItem(@RequestBody Map<String, Object> request) {
         Integer playerId = (Integer) request.get("playerId");
         Integer itemId = (Integer) request.get("itemId");
-
-        ApiResponse<InventoryModel> response;
-        try {
-            response = marketPlaceService.buyItem(playerId, itemId);
-        } catch (Exception e) {
-            response = new ApiResponse<>();
-            response.setStatus(500);
-            response.setMessage("Internal Server Error");
-            response.setDescription(e.getMessage());
-        }
+        ApiResponse<InventoryModel> response = marketPlaceService.buyItem(playerId, itemId);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 

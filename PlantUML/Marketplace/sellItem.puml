@@ -1,0 +1,40 @@
+@startuml
+title sellItem(playerId: Integer, itemId: Integer, price: double)
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : POST /api/v1/market/sell(playerId, itemId, price)
+a->a : Find player by playerId
+alt Player not found
+    a->u : 400 Bad Request
+    a->u : "Player not found with ID: playerId"
+else Player found
+    a->a : Find inventory by itemId
+    alt Inventory not found
+        a->u : 400 Bad Request
+        a->u : "Inventory item not found with ID: itemId"
+    else Inventory found
+        a->a : Find market item by inventoryId
+        a->a : Check if player owns the inventory
+        alt Player does not own the inventory
+            a->u : 400 Bad Request
+            a->u : "Player is not the owner of the inventory item."
+        else Player owns the inventory
+            a->a : Check if player already has the same item on the market
+            alt Player already has the same item on the market
+                a->u : 400 Bad Request
+                a->u : "You already have the item on the market."
+            else Player does not have the same item on the market
+                a->a : Add market item
+                a->a : Add notification to player's inbox
+                a->u : 201 Created
+                a->u : "You have successfully added the item to the market."
+                a->u : JSON MarketPlaceModel data
+            end
+        end
+    end
+end
+
+@enduml

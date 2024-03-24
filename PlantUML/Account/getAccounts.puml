@@ -1,0 +1,22 @@
+@startuml
+title getAllAccounts()
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : GET /api/v1/account
+a->d: findAll()
+a->a : Validate accounts
+
+alt Account found
+    d-->a : accounts
+    a->u : 200 OK
+    a->u : "Data retrieved successfully"
+    a->u : JSON Account data
+else Account not found
+    a->u : 404 Not Found
+    a->u : "Account not found"
+end
+
+@enduml

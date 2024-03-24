@@ -1,64 +1,107 @@
 package th.co.prior.lab1.adventureshops.service.implement;
 
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import th.co.prior.lab1.adventureshops.dto.InventoryDto;
 import th.co.prior.lab1.adventureshops.dto.MonsterDto;
 import th.co.prior.lab1.adventureshops.dto.PlayerDto;
 import th.co.prior.lab1.adventureshops.entity.PlayerEntity;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
 import th.co.prior.lab1.adventureshops.entity.MonsterEntity;
 import th.co.prior.lab1.adventureshops.model.ApiResponse;
+import th.co.prior.lab1.adventureshops.model.InventoryModel;
 import th.co.prior.lab1.adventureshops.repository.InventoryRepository;
 import th.co.prior.lab1.adventureshops.service.InventoryService;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor(onConstructor_ = {@Lazy})
 public class InventoryServiceImpl implements InventoryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryServiceImpl.class);
     private final InventoryRepository inventoryRepository;
-    private final PlayerServiceImpl playerService;
-    private final MonsterServiceImpl monsterService;
     private final PlayerDto playerDto;
-    private MonsterDto monsterDto;
+    private final MonsterDto monsterDto;
+    private final InventoryDto inventoryDto;
+
+    public InventoryServiceImpl(InventoryRepository inventoryRepository, PlayerDto playerDto, MonsterDto monsterDto, InventoryDto inventoryDto) {
+        this.inventoryRepository = inventoryRepository;
+        this.playerDto = playerDto;
+        this.monsterDto = monsterDto;
+        this.inventoryDto = inventoryDto;
+    }
 
     @Override
     public ApiResponse<List<InventoryEntity>> getAllInventories() {
         ApiResponse<List<InventoryEntity>> result = new ApiResponse<>();
         try {
-            List<InventoryEntity> inventories = this.inventoryRepository.findAll();
+            List<InventoryEntity> inventories = inventoryRepository.findAll();
             if (!inventories.isEmpty()) {
                 result.setStatus(200);
                 result.setDescription("List of all Inventories retrieved successfully.");
                 result.setData(inventories);
             } else {
                 result.setStatus(404);
-                result.setDescription("Not Inventories Found!");
+                result.setDescription("No Inventories Found!");
             }
         } catch (Exception e) {
             result.setStatus(500);
-            result.setDescription(e.getMessage());
+            result.setDescription("Internal Server Error");
+            LOGGER.error("Error fetching all inventories: {}", e.getMessage());
         }
         return result;
     }
 
+//    @Override
+//    public ApiResponse<InventoryModel> getInventoryByName(String name) {
+//        ApiResponse<InventoryModel> result = new ApiResponse<>();
+//        try {
+//            LOGGER.info("Searching for inventory by name: {}", name);
+//
+//            List<InventoryEntity> inventories = inventoryRepository.findByName(name);
+//
+//            if (!inventories.isEmpty()) {
+//                LOGGER.info("Found {} inventories with name: {}", inventories.size(), name);
+//                // Assuming you want to return the first inventory found
+//                InventoryEntity firstInventory = inventories.get(0);
+//                InventoryModel inventoryModel = this.inventoryDto.toDTO(firstInventory);
+//
+//                result.setStatus(200);
+//                result.setDescription("OK");
+//                result.setData(inventoryModel);
+//            } else {
+//                result.setStatus(404);
+//                result.setDescription("Inventory not found with name: " + name);
+//            }
+//        } catch (Exception e) {
+//            result.setStatus(500);
+//            result.setDescription("Internal Server Error");
+//            LOGGER.error("Error fetching inventory by name: {}", e.getMessage(), e);
+//        }
+//        return result;
+//    }
+//
+
+
     @Override
-    public ApiResponse<InventoryEntity> getInventoryById(Integer id) {
-        ApiResponse<InventoryEntity> result = new ApiResponse<>();
+    public ApiResponse<InventoryModel> getInventoryById(Integer id) {
+        ApiResponse<InventoryModel> result = new ApiResponse<>();
         try {
-            InventoryEntity inventory = this.inventoryRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Inventory not found!"));
-            result.setStatus(200);
-            result.setDescription("OK");
-            result.setData(inventory);
+            InventoryEntity inventory = inventoryRepository.findById(id)
+                    .orElse(null);
+            if (inventory != null) {
+                result.setStatus(200);
+                result.setDescription("OK");
+                result.setData(this.inventoryDto.toDTO(inventory));
+            } else {
+                result.setStatus(404);
+                result.setDescription("Inventory not found!");
+            }
         } catch (Exception e) {
             result.setStatus(500);
-            result.setDescription(e.getMessage());
+            result.setDescription("Internal Server Error");
+            LOGGER.error("Error fetching inventory by id: {}", e.getMessage());
         }
         return result;
     }
@@ -67,9 +110,8 @@ public class InventoryServiceImpl implements InventoryService {
     public void addInventory(String name, Integer playerId, Integer monsterId) {
         ApiResponse<String> result = new ApiResponse<>();
         try {
-
-            PlayerEntity character = this.playerDto.findPlayerById(playerId);
-            MonsterEntity monster = this.monsterDto.findMonsterById(monsterId);
+            PlayerEntity character = playerDto.findPlayerById(playerId);
+            MonsterEntity monster = monsterDto.findMonsterById(monsterId);
 
             if (character != null && monster != null) {
                 InventoryEntity inventory = new InventoryEntity();
@@ -81,12 +123,17 @@ public class InventoryServiceImpl implements InventoryService {
                 result.setStatus(200);
                 result.setDescription("OK");
                 result.setData("You have successfully added inventory.");
+            } else {
+                result.setStatus(400);
+                result.setDescription("Invalid player or monster ID provided.");
             }
         } catch (Exception e) {
             result.setStatus(500);
-            result.setDescription(e.getMessage());
+            result.setDescription("Internal Server Error");
+            LOGGER.error("Error adding inventory: {}", e.getMessage());
         }
     }
+
 
     public void changeOwner(PlayerEntity character, InventoryEntity inventory) {
         try {

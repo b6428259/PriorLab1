@@ -1,0 +1,22 @@
+@startuml
+title getAllPlayer()
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : GET /api/v1/player
+a->d: findAll()
+a->a : Validate players
+
+alt Player found
+    d-->a : players
+    a->u : 200 OK
+    a->u : "Data retrieved successfully"
+    a->u : JSON Player data
+else Player not found
+    a->u : 404 Not Found
+    a->u : "Player not found"
+end
+
+@enduml

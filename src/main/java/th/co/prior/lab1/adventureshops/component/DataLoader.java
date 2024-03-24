@@ -17,15 +17,17 @@ public class DataLoader implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        int initialDamage = 500;
+        int initialDamage = 100;
         int numLevels = 100;
+        int exp = 500;
 
         levelService.removeAllLevels();
 
         for (int i = 0; i < numLevels; i++) {
             LevelEntity level = new LevelEntity();
             level.setId((long) (i + 1));
-            level.setDamage(initialDamage + i * 200);
+            level.setDamage(initialDamage + i * 100);
+            level.setExp(exp + i * 300);
             levelService.save(level);
         }
 

@@ -46,8 +46,11 @@ public class PlayerController {
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<PlayerModel>> updatePlayer(
             @PathVariable Integer id,
-            @RequestParam String name
-    ) {
+            @RequestBody Map<String, Object> request)
+    {
+        String name = (String) request.get("name");
+
         ApiResponse<PlayerModel> response = playerService.updatePlayer(id, name);
         return ResponseEntity.status(response.getStatus()).body(response);
-    }}
+    }
+}

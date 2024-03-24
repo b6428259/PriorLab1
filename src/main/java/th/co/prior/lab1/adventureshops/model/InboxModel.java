@@ -7,7 +7,7 @@ public class InboxModel {
 
     private Integer id;
 
-    private String name;
+    private String Recipient;
 
     private String message;
 

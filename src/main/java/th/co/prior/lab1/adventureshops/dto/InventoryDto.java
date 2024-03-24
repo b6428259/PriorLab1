@@ -40,15 +40,16 @@ public class InventoryDto {
         return dto;
     }
 
+
+
     public List<InventoryEntity> findAllInventory(){
         return inventoryRepository.findAll();
     }
 
-    public InventoryEntity findInventoryById(Integer id){
-        return inventoryRepository.findById(id).orElse(null);
-    }
+        public InventoryEntity findInventoryById(Integer id){
+            return inventoryRepository.findById(id).orElse(null);
+        }
 
-    public InventoryEntity findInventoryByName(String name) { return inventoryRepository.findInventoryByName(name).orElse(null); }
 
     public void addInventory(String name, Integer playerId, Integer monsterId) {
         try {

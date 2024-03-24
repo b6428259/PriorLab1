@@ -60,11 +60,11 @@ public class PlayerServiceImpl implements PlayerService {
         result.setMessage("Not Found");
 
         try {
-            PlayerEntity character = playerRepository.findById(id).orElseThrow(() -> new NullPointerException("Character not found!"));
+            PlayerEntity character = playerRepository.findById(id).orElseThrow(() -> new NullPointerException("Player not found!"));
 
             result.setStatus(200);
             result.setMessage("OK");
-            result.setDescription("Successfully retrieved character information.");
+            result.setDescription("Successfully retrieved player information.");
             result.setData(this.playerDTO.toDTO(character));
         } catch (NullPointerException e) {
             result.setDescription(e.getMessage());
@@ -102,7 +102,7 @@ public class PlayerServiceImpl implements PlayerService {
                     result.setDescription("Duplicate name. Please enter another name.");
                 }
             } else {
-                result.setDescription("Please enter a name of at least 3 characters.");
+                result.setDescription("Please enter a name");
             }
         } catch (Exception e) {
             result.setStatus(500);

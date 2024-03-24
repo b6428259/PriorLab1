@@ -33,7 +33,7 @@ public class InboxDto {
     public InboxModel toDTO(InboxEntity inbox){
         InboxModel dto = new InboxModel();
         dto.setId(inbox.getId());
-        dto.setName(inbox.getPlayer().getName());
+        dto.setRecipient(inbox.getPlayer().getName());
         dto.setMessage(inbox.getMessage());
 
         return dto;

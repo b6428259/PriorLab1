@@ -1,0 +1,22 @@
+@startuml
+title GET /api/v1/levels
+
+actor User as u
+boundary API as a
+database Redis as d
+
+u->a : GET api/v1/levels
+a->d: findAll()
+a->a : Validate levels
+
+alt Level found
+    d-->a : Levels data
+    a->u : 200 OK
+    a->u : "Data retrieved successfully"
+    a->u : JSON Level data
+else Level not found
+    a->u : 404 Not Found
+    a->u : "Level not found"
+end
+
+@enduml

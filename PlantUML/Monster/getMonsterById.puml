@@ -1,0 +1,22 @@
+@startuml
+title getMonsterById(id: Integer)
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : GET /api/v1/monster/{id}
+a->d: findById(id)
+a->a : Validate monster
+
+alt Monster found
+    d-->a : monster
+    a->u : 200 OK
+    a->u : "Data retrieved successfully"
+    a->u : JSON Monster data
+else Monster not found
+    a->u : 404 Not Found
+    a->u : "Monster not found"
+end
+
+@enduml

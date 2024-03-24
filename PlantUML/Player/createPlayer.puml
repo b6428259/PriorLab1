@@ -1,0 +1,33 @@
+@startuml
+title createPlayer(name: String)
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : createPlayer(name: String)
+a->a : Validate inputs
+
+alt Valid inputs
+    a->d : findPlayerByName(name)
+    d-->a : duplicatePlayer
+    a->a : Check if duplicatePlayer is empty
+
+    alt duplicatePlayer not found
+        a->d : save(player)
+        d-->a : saved
+        a->a: generateRandomAccountNumber()
+        a->a: createAccount(player, accountNumbers)
+        a->u : 201 Created
+        a->u : "Successfully created player information."
+        a->u : JSON Player data
+    else duplicatePlayer found
+        a->u : 400 Bad Request
+        a->u : "Duplicate name. Please enter another name."
+    end
+else Invalid inputs
+    a->u : 400 Bad Request
+    a->u : "Please enter your name."
+end
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+title getMarketPlaceById(id: Integer)
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : GET /api/v1/market/{id}
+a->d: findById(market_id)
+a->a : Validate market
+
+alt Market found
+    d-->a : marketPlace
+    a->u : 200 OK
+    a->u : "Data retrieved successfully"
+    a->u : JSON Market data
+else Market not found
+    a->u : 404 Not Found
+    a->u : "Market not found"
+end
+
+@enduml

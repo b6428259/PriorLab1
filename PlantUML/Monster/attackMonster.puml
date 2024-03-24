@@ -1,0 +1,29 @@
+@startuml
+title attackMonster(playerId: Integer, monsterId: Integer)
+
+actor User as u
+boundary API as a
+database Database as d
+
+u->a : attackMonster(playerId, monsterId)
+a->a : Find player by playerId
+a->a : Find monster by monsterId
+
+alt Player and monster found
+    a->a : Find player's level
+    a->a : Calculate player's damage
+    a->a : Check if monster's health is less than or equal to player's damage
+    alt Monster killed
+        a->a : Add monster's drop item to player's inventory
+        a->u : 200 OK
+        a->u : "You have successfully killed the monster. You have received a drop item."
+    else Monster not killed
+        a->u : 200 OK
+        a->u : "You have been killed by the monster. Your damage is not enough."
+    end
+else Player or monster not found
+    a->u : 404 Not Found
+    a->u : "Player or monster not found."
+end
+
+@enduml

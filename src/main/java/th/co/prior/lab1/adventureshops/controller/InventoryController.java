@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
 import th.co.prior.lab1.adventureshops.model.ApiResponse;
+import th.co.prior.lab1.adventureshops.model.InventoryModel;
 import th.co.prior.lab1.adventureshops.service.InventoryService;
 
 
@@ -26,9 +27,29 @@ public class InventoryController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<InventoryEntity>> getInventoryById(@PathVariable Integer id) {
-        ApiResponse<InventoryEntity> response = inventoryService.getInventoryById(id);
-        return ResponseEntity.status(response.getStatus()).body(response);
+
+//    @GetMapping("/name/{name}")
+//    public ApiResponse<InventoryModel> getInventoryByName(@PathVariable("name") String name) {
+//        return inventoryService.getInventoryByName(name);
+//    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ApiResponse<InventoryModel>> getInventoryByName(@PathVariable("name") String name) {
+        ApiResponse<InventoryModel> response = inventoryService.getInventoryByName(name);
+
+        return  ResponseEntity.status(response.getStatus()).body(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<InventoryModel>> getInventoryById(@PathVariable Integer id) {
+        ApiResponse<InventoryModel> response = inventoryService.getInventoryById(id);
+        if (response.getStatus() == 200) {
+            return ResponseEntity.ok(response);
+        } else if (response.getStatus() == 404) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.status(response.getStatus()).body(response);
+        }
+    }
+
 }

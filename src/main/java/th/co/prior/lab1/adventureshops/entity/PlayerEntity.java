@@ -47,12 +47,12 @@ public class PlayerEntity {
     @Column(name = "level_id")
     private Integer levelId;
 
+
     @Setter
     @Getter
+    @JsonIgnore
     @Transient
     private LevelEntity level;
-
-
 
     @PrePersist
     public void prePersist() {
