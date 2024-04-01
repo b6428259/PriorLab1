@@ -5,17 +5,21 @@ actor User as u
 boundary API as a
 database Database as d
 
-u->a : attackMonster(playerId, monsterId)
-a->a : Find player by playerId
-a->a : Find monster by monsterId
+u->a : POST /api/v1/monster/attack(playerId, monsterId)
+
+a->d : Find player by playerId
+a->d : Find monster by monsterId
+d-->a : Receive Player and Monster's data
+a->a : Validate Player and Monster
 
 alt Player and monster found
-    a->a : Find player's level
+    a->d : Find player's damage by level
+    d-->a : Receive player's damage
     a->a : Calculate player's damage
     a->a : Check if monster's health is less than or equal to player's damage
     alt Monster killed
-        a->a : Add monster's drop item to player's inventory
-        a->u : 200 OK
+        a->d : Add monster's drop item to player's inventory
+        ...200 OK...
         a->u : "You have successfully killed the monster. You have received a drop item."
     else Monster not killed
         a->u : 200 OK

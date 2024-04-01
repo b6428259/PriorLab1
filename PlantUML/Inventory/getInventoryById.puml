@@ -7,10 +7,11 @@ database Database as d
 
 u->a : GET /api/v1/inventory/{id}
 a->d: findById(inventory_id)
+    d-->a : inventory data
 a->a : Validate inventory
 
 alt Inventory found
-    d-->a : inventory
+
     a->u : 200 OK
     a->u : "Data retrieved successfully"
     a->u : JSON Inventory data

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import th.co.prior.lab1.adventureshops.dto.InventoryDto;
 import th.co.prior.lab1.adventureshops.dto.MonsterDto;
 import th.co.prior.lab1.adventureshops.dto.PlayerDto;
@@ -20,15 +19,12 @@ import th.co.prior.lab1.adventureshops.service.implement.InventoryServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
-class AdventureshopsApplicationTests {
+public class InventoryServiceImplTest {
 
     @Mock
     private InventoryRepository inventoryRepository;

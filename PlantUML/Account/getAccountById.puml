@@ -6,11 +6,13 @@ boundary API as a
 database Database as d
 
 u->a : GET /api/v1/account/{id}
+
 a->d: findById(account_id)
+d-->a : account data
 a->a : Validate account
 
 alt Account found
-    d-->a : account data
+
     a->u : 200 OK
     a->u : "Data retrieved successfully"
     a->u : JSON Account data

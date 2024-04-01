@@ -7,10 +7,11 @@ database Database as d
 
 u->a : GET /api/v1/player/{id}
 a->d: findById(player_id)
+    d-->a : player
 a->a : Validate player
 
 alt Player found
-    d-->a : player
+
     a->u : 200 OK
     a->u : "Data retrieved successfully"
     a->u : JSON Player data

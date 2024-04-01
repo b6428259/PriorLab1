@@ -10,14 +10,14 @@ a->a : Validate inputs
 
 alt Valid inputs
     a->d : findPlayerByName(name)
-    d-->a : duplicatePlayer
+    d-->a : duplicatePlayer data
     a->a : Check if duplicatePlayer is empty
 
     alt duplicatePlayer not found
         a->d : save(player)
         d-->a : saved
         a->a: generateRandomAccountNumber()
-        a->a: createAccount(player, accountNumbers)
+        a->d: createAccount(player, accountNumbers)
         a->u : 201 Created
         a->u : "Successfully created player information."
         a->u : JSON Player data

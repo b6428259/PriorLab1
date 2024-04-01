@@ -33,12 +33,12 @@ public class InventoryController {
 //        return inventoryService.getInventoryByName(name);
 //    }
 
-    @GetMapping("/name/{name}")
-    public ResponseEntity<ApiResponse<InventoryModel>> getInventoryByName(@PathVariable("name") String name) {
-        ApiResponse<InventoryModel> response = inventoryService.getInventoryByName(name);
-
-        return  ResponseEntity.status(response.getStatus()).body(response);
-    }
+//    @GetMapping("/name/{name}")
+//    public ResponseEntity<ApiResponse<InventoryModel>> getInventoryByName(@PathVariable("name") String name) {
+//        ApiResponse<InventoryModel> response = inventoryService.getInventoryByName(name);
+//
+//        return  ResponseEntity.status(response.getStatus()).body(response);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<InventoryModel>> getInventoryById(@PathVariable Integer id) {

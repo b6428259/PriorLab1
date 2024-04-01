@@ -7,10 +7,11 @@ database Redis as d
 
 u->a : GET api/v1/levels
 a->d: findAll()
+    d-->a : Levels data
 a->a : Validate levels
 
 alt Level found
-    d-->a : Levels data
+
     a->u : 200 OK
     a->u : "Data retrieved successfully"
     a->u : JSON Level data

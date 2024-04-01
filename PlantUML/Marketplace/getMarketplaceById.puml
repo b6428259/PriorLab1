@@ -7,10 +7,11 @@ database Database as d
 
 u->a : GET /api/v1/market/{id}
 a->d: findById(market_id)
+    d-->a : marketPlace data
 a->a : Validate market
 
 alt Market found
-    d-->a : marketPlace
+
     a->u : 200 OK
     a->u : "Data retrieved successfully"
     a->u : JSON Market data
