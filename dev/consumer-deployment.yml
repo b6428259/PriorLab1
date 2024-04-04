@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-deployment
+  namespace: dev
+  labels:
+    app: consumer-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer-deployment
+  template:
+    metadata:
+      labels:
+        app: consumer-deployment
+    spec:
+      hostAliases:
+        - ip: 127.0.0.1
+          hostnames:
+            - localhost
+        - ip: 192.168.65.2
+          hostnames:
+            - host.minikube.internal
+      containers:
+      - name: consumer-deployment
+        image: consumer:1.0
+        imagePullPolicy: Never
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /consumer/health/check
+            port: http
+          failureThreshold: 3
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /consumer/health/check
+            port: http
+          failureThreshold: 3
+          periodSeconds: 30
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms256m -Xmx1024m"
+        - name: SPRING_CONFIG
+          value: "/home/app/config/application.yml"
+        volumeMounts:
+        - name: consumer-volume
+          subPath: application-2.yaml
+          mountPath: /home/app/config/application.yml
+        - name: consumer-volume
+          subPath: mytestfile.txt
+          mountPath: /home/app/config/mytestfile.txt
+      volumes:
+      - name: consumer-volume
+        configMap:
+          name: consumer-configmap
+

@@ -57,10 +57,10 @@ public class PlayerServiceImpl implements PlayerService {
     public ApiResponse<PlayerModel> getPlayerById(Integer id) {
         ApiResponse<PlayerModel> result = new ApiResponse<>();
         result.setStatus(404);
-        result.setMessage("Not Found");
+        result.setMessage("Not Found" + id );
 
         try {
-            PlayerEntity character = playerRepository.findById(id).orElseThrow(() -> new NullPointerException("Player not found!"));
+            PlayerEntity character = playerRepository.findById(id).orElseThrow(() -> new NullPointerException("Player not found!" + id));
 
             result.setStatus(200);
             result.setMessage("OK");

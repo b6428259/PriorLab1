@@ -1,0 +1,25 @@
+# FILEPATH: /c:/Users/thebi/IdeaProjects/adventureshops/src/main/resources/application.yml
+spring:
+    application:
+        name: adventureshops
+    servlet:
+        context-path: /api/v1/
+    datasource:
+        url: jdbc:mysql://localhost:3306/adventure
+        username: admin
+        password: admin
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+    data:
+        redis:
+            host: localhost
+            port: 6379
+            password: superpassword  # Add the password here
+app:
+  config:
+    kafka:
+        server: localhost:29092
+        topic: report-message
+        partitions: 1

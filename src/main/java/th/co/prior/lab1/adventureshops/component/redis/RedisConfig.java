@@ -1,4 +1,4 @@
-package th.co.prior.lab1.adventureshops.redis;
+package th.co.prior.lab1.adventureshops.component.redis;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

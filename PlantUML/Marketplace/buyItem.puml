@@ -10,45 +10,38 @@ a->d : Find market item by itemId
 d-->a : Receive Item data
 a->a : Validate Item
 alt Market item not found
-    a->u : 400 Bad Request
-    a->u : "Market item not found with ID: itemId"
+    a->u : 400 "Market item not found with ID: itemId"
 else Market item found
     a->d : Find player by playerId
     d-->a : Receive player data
     a->a : Validate player
     alt Player not found
-        a->u : 400 Bad Request
-        a->u : "Player not found with ID: playerId"
+        a->u : 400 "Player not found with ID: playerId"
     else Player found
         a->d : Find inventory by market item's inventory ID
         d-->a : Receive inventory data
         a->a : Validate inventory
         alt Inventory not found
-            a->u : 400 Bad Request
-            a->u : "Inventory item not found with ID: inventoryId"
+            a->u : 400 "Inventory item not found with ID: inventoryId"
         else Inventory found
             a->d : Find account by player's account ID
             d-->a : Receive account data
             a->a : Validate account
             alt Account not found
-                a->u : 400 Bad Request
-                a->u : "Account not found for player with ID: playerId"
+                a->u : 400 "Account not found for player with ID: playerId"
 
             else Account found
                 a->a : Check if player owns the inventory
                 alt Player does not own the inventory
-                    a->u : 400 Bad Request
-                    a->u : "You are not authorized to purchase this item."
+                    a->u : 400 "You are not authorized to purchase this item."
                 else Player owns the inventory
                     a->a : Check if market item is sold
                     alt Market item is sold
-                        a->u : 400 Bad Request
-                        a->u : "The item has already been sold."
+                        a->u : 400 "The item has already been sold."
                     else Market item is not sold
                         a->a : Check if player has enough balance
                         alt Player does not have enough balance
-                            a->u : 400 Bad Request
-                            a->u : "Your balance is insufficient."
+                            a->u : 400 "Your balance is insufficient."
                         else Player has enough balance
                             a->d : Deposit cost to seller's account
                             a->d : Withdraw cost from buyer's account
@@ -57,8 +50,7 @@ else Market item found
                             a->d : send notification to seller's inbox
                             a->u : 200 "Successfully purchased an item."
           note right
-            the <U+0025>autonumber<U+0025> works everywhere.
-            Here, its value is ** %autonumber% **
+            200 OK
           end note
                             a->u : JSON Inventory data
                         end

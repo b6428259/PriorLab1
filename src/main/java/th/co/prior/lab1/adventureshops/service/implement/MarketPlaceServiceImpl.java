@@ -3,6 +3,7 @@ package th.co.prior.lab1.adventureshops.service.implement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import th.co.prior.lab1.adventureshops.component.kafka.component.KafkaProducerComponent;
 import th.co.prior.lab1.adventureshops.dto.*;
 import th.co.prior.lab1.adventureshops.entity.AccountEntity;
 import th.co.prior.lab1.adventureshops.entity.InventoryEntity;
@@ -30,6 +31,7 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
     private final InboxDto inboxDto;
     private final AccountDto accountDto;
     private final EntityDto entityDto;
+    private final KafkaProducerComponent kafkaProducerComponent;
 
     @Override
     public ApiResponse<List<MarketPlaceModel>> getAllMarkerPlace() {
@@ -122,7 +124,10 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
                             marketPlaceRepository.save(marketPlaces);
 
                             inboxDto.addInbox(marketPlaces.getPlayer().getId(),
-                                    "Your " + marketPlaces.getInventory().getName() + " has been sold.");
+                                    "Your " + marketPlaces.getInventory().getName() + " has been sold." + cost);
+
+                            String message = "Your " + marketPlaces.getInventory().getName() + " has been sold for " + cost;
+                            kafkaProducerComponent.send("report-message", null, null, message);
 
                             result.setStatus(HttpStatus.OK.value());
                             result.setMessage("OK");
@@ -172,6 +177,9 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
                 if (marketDto.checkItemIdIsNotEquals(marketPlaces, inventory)) {
                     marketDto.addMarketPlace(playerId, inventory.getId(), price);
                     inboxDto.addInbox(playerId, "Your " + inventory.getName() + " has been added to the market.");
+
+                    String message = "Your " + inventory.getName() + " has been added to the market.";
+                    kafkaProducerComponent.send("report-message", null, null, message);
 
                     result.setStatus(HttpStatus.CREATED.value());
                     result.setMessage("Created");
