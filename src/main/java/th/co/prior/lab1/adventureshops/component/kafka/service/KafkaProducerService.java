@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaProducerService {
 
-    private static final String TOPIC = "report-message"; // Same as configured in application.yml
+    private static final String TOPIC = "report-message"; // Same as configured in application.yaml
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;

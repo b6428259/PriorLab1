@@ -55,7 +55,7 @@ public class InboxServiceImpl implements InboxService {
 
     @Override
     public ApiResponse<InboxModel> getInboxById(Integer id) {
-        ApiResponse<InboxModel> result = new ApiResponse<>();
+        ApiResponse<InboxModel> result = new    ApiResponse<>();
         result.setStatus(HttpStatus.NOT_FOUND.value());
         result.setMessage("Not Found");
 

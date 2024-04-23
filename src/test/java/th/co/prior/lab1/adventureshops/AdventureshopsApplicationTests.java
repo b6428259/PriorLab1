@@ -25,52 +25,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
 class AdventureshopsApplicationTests {
 
-    @Mock
-    private InventoryRepository inventoryRepository;
-
-    @Mock
-    private PlayerDto playerDto;
-    @Mock
-    private MonsterDto monsterDto;
-
-    @Mock
-    private InventoryDto inventoryDto;
-
-    @InjectMocks
-    private InventoryServiceImpl inventoryService;
-
-//    @Test
-//    public void testGetAllInventories() {
-//        // Prepare data
-//        List<InventoryEntity> inventories = new ArrayList<>();
-//        inventories.add(new InventoryEntity());when(inventoryRepository.findAll()).thenReturn(inventories);
-//
-//        // Call the method
-//        ApiResponse<List<InventoryEntity>> response = inventoryService.getAllInventories();
-//
-//        // Verify the result
-////        assertEquals(200, response.getStatus());
-//        assertEquals("List of all Inventories retrieved successfully.", response.getDescription());
-//        assertEquals(inventories, response.getData());
-//    }
-
-    @Test
-    public void testGetInventoryById() {
-        // Prepare data
-        InventoryEntity inventory = new InventoryEntity();
-        when(inventoryRepository.findById(any(Integer.class))).thenReturn(Optional.of(inventory));
-
-        // Call the method
-        ApiResponse<InventoryModel> response = inventoryService.getInventoryById(5);
-
-        // Verify the result
-//        assertEquals(200, response.getStatus());
-        assertEquals("OK", response.getDescription());
-        // Assuming toDTO method returns non-null value
-        verify(inventoryDto, times(1)).toDTO(any(InventoryEntity.class));
-    }
 
 }

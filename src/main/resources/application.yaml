@@ -1,4 +1,4 @@
-# FILEPATH: /c:/Users/thebi/IdeaProjects/adventureshops/src/main/resources/application.yml
+# FILEPATH: /c:/Users/thebi/IdeaProjects/adventureshops/src/main/resources/application.yaml
 spring:
     application:
         name: adventureshops

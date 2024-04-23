@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
-public class MarketDto {
+public class    MarketDto {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MarketDto.class);
     private final EntityDto entityDTO;

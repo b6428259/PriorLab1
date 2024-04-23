@@ -17,7 +17,7 @@ else Market item found
     a->a : Validate player
     alt Player not found
         a->u : 400 "Player not found with ID: playerId"
-    else Player found
+    else Pla yer found
         a->d : Find inventory by market item's inventory ID
         d-->a : Receive inventory data
         a->a : Validate inventory

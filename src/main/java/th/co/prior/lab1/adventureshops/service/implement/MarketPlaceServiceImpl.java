@@ -85,75 +85,86 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
         return result;
     }
 
-        @Override
-        public ApiResponse<InventoryModel> buyItem(Integer playerId, Integer itemId) {
-            ApiResponse<InventoryModel> result = new ApiResponse<>();
+    @Override
+    public ApiResponse<InventoryModel> buyItem(Integer playerId, Integer itemId) {
+        ApiResponse<InventoryModel> result = new ApiResponse<>();
 
-            try {
-                MarketPlaceEntity marketPlaces = marketDto.findMarketPlaceById(itemId);
-                if (marketPlaces == null) {
-                    throw new MarketItemNotFoundException("Market item not found with ID: " + itemId);
-                }
-
-                PlayerEntity player = playerDTO.findPlayerById(playerId);
-                if (player == null) {
-                    throw new PlayerNotFoundException("Player not found with ID: " + playerId);
-                }
-
-                InventoryEntity inventory = inventoryDto.findInventoryById(marketPlaces.getInventory().getId());
-                if (inventory == null) {
-                    throw new InventoryItemNotFoundException("Inventory item not found with ID: " + marketPlaces.getInventory().getId());
-                }
-
-                AccountEntity account = accountDto.findAccountById(player.getAccount().getId());
-                if (account == null) {
-                    throw new AccountNotFoundException("Account not found for player with ID: " + playerId);
-                }
-
-                if (this.entityDto.hasEntity(player, inventory)) {
-                    if (!marketPlaces.isSold()) {
-                        double cost = marketPlaces.getCost();
-                        if (cost <= account.getBalance()) {
-                            accountDto.depositBalance(marketPlaces.getPlayer().getId(), cost);
-                            accountDto.withdrawBalance(playerId, cost);
-
-                            inventoryDto.changeOwner(player, inventory);
-                            inventoryDto.setOnMarket(inventory, false);
-
-                            marketPlaces.setSold(true);
-                            marketPlaceRepository.save(marketPlaces);
-
-                            inboxDto.addInbox(marketPlaces.getPlayer().getId(),
-                                    "Your " + marketPlaces.getInventory().getName() + " has been sold." + cost);
-
-                            String message = "Your " + marketPlaces.getInventory().getName() + " has been sold for " + cost;
-                            kafkaProducerComponent.send("report-message", null, null, message);
-
-                            result.setStatus(HttpStatus.OK.value());
-                            result.setMessage("OK");
-                            result.setDescription("Successfully purchased a " + marketPlaces.getInventory().getName() + ".");
-                            result.setData(inventoryDto.toDTO(inventory));
-                        } else {
-                            throw new InsufficientFundsException("Your balance is insufficient.");
-                        }
-                    } else {
-                        throw new ItemAlreadySoldException("The " + marketPlaces.getInventory().getName() + " has already been sold.");
-                    }
-                } else {
-                    throw new UnauthorizedAccessException("You are not authorized to purchase this item.");
-                }
-            } catch (MarketItemNotFoundException | PlayerNotFoundException | InventoryItemNotFoundException | AccountNotFoundException | InsufficientFundsException | ItemAlreadySoldException | UnauthorizedAccessException e) {
-                result.setStatus(HttpStatus.BAD_REQUEST.value());
-                result.setMessage("Bad Request");
-                result.setDescription(e.getMessage());
-            } catch (Exception e) {
-                result.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-                result.setMessage("Internal Server Error");
-                result.setDescription(e.getMessage());
+        try {
+            MarketPlaceEntity marketPlaces = marketDto.findMarketPlaceById(itemId);
+            if (marketPlaces == null) {
+                throw new MarketItemNotFoundException("Market item not found with ID: " + itemId);
             }
 
-            return result;
+            PlayerEntity player = playerDTO.findPlayerById(playerId);
+            if (player == null) {
+                throw new PlayerNotFoundException("Player not found with ID: " + playerId);
+            }
+
+            // Check if the inventory entity associated with the market place entity is null
+            if (marketPlaces.getInventory() == null) {
+                throw new InventoryItemNotFoundException("Inventory item is null for market item with ID: " + itemId);
+            }
+
+            InventoryEntity inventory = inventoryDto.findInventoryById(marketPlaces.getInventory().getId());
+            if (inventory == null) {
+                throw new InventoryItemNotFoundException("Inventory item not found with ID: " + marketPlaces.getInventory().getId());
+            }
+
+            AccountEntity account = accountDto.findAccountById(player.getAccount().getId());
+            if (account == null) {
+                throw new AccountNotFoundException("Account not found for player with ID: " + playerId);
+            }
+
+            if (this.entityDto.hasEntity(player, inventory)) {
+                if (!marketPlaces.isSold()) {
+                    double cost = marketPlaces.getCost();
+                    if (cost <= account.getBalance()) {
+                        if (marketPlaces.getPlayer() != null) {
+                            accountDto.depositBalance(marketPlaces.getPlayer().getId(), cost);
+                            inboxDto.addInbox(marketPlaces.getPlayer().getId(),
+                                    "Your " + marketPlaces.getInventory().getName() + " has been sold." + cost);
+                        } else {
+                            throw new PlayerNotFoundException("Player not found for the market item with ID: " + itemId);
+
+                        }
+
+                        accountDto.withdrawBalance(playerId, cost);
+
+                        inventoryDto.changeOwner(player, inventory);
+                        inventoryDto.setOnMarket(inventory, false);
+
+                        marketPlaces.setSold(true);
+                        marketPlaceRepository.save(marketPlaces);
+
+                        String message = "Your " + marketPlaces.getInventory().getName() + " has been sold for " + cost;
+                        kafkaProducerComponent.send("report-message", null, null, message);
+
+                        result.setStatus(HttpStatus.OK.value());
+                        result.setMessage("OK");
+                        result.setDescription("Successfully purchased a " + marketPlaces.getInventory().getName() + ".");
+                        result.setData(inventoryDto.toDTO(inventory));
+
+                    } else {
+                        throw new InsufficientFundsException("Your balance is insufficient.");
+                    }
+                } else {
+                    throw new ItemAlreadySoldException("The " + marketPlaces.getInventory().getName() + " has already been sold.");
+                }
+            } else {
+                throw new UnauthorizedAccessException("You are not authorized to purchase this item.");
+            }
+
+        } catch (MarketItemNotFoundException | PlayerNotFoundException | InventoryItemNotFoundException | AccountNotFoundException | InsufficientFundsException | ItemAlreadySoldException | UnauthorizedAccessException e) {
+            result.setStatus(HttpStatus.BAD_REQUEST.value());
+            result.setMessage("Bad Request");
+            result.setDescription(e.getMessage());
+        } catch (Exception e) {
+            result.setStatus(HttpStatus.BAD_REQUEST.value());
+            result.setMessage("Bad Request");
+            result.setDescription(e.getMessage());
         }
+        return result;
+    }
 
     @Override
     public ApiResponse<MarketPlaceModel> sellItem(Integer playerId, Integer itemId, double price) {
@@ -193,13 +204,14 @@ public class MarketPlaceServiceImpl implements MarketPlaceService {
             } else {
                 throw new UnauthorizedAccessException("Player is not the owner of the inventory item.");
             }
-        } catch (PlayerNotFoundException | InventoryItemNotFoundException | UnauthorizedAccessException e) {
+        } catch (MarketItemNotFoundException | PlayerNotFoundException | InventoryItemNotFoundException |
+                 InsufficientFundsException | ItemAlreadySoldException | UnauthorizedAccessException e) {
             result.setStatus(HttpStatus.BAD_REQUEST.value());
             result.setMessage("Bad Request");
             result.setDescription(e.getMessage());
         } catch (Exception e) {
-            result.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            result.setMessage("Internal Server Error");
+            result.setStatus(HttpStatus.BAD_REQUEST.value());
+            result.setMessage("Bad Request"); // เปลี่ยนข้อความจาก "Internal Server Error" เป็น "Bad Request"
             result.setDescription(e.getMessage());
         }
 

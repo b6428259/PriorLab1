@@ -21,7 +21,7 @@ import java.util.Random;
 @AllArgsConstructor
 public class PlayerServiceImpl implements PlayerService {
 
-    private final AccountDto accountUtils;
+    private final AccountDto accountDto;
     private final LevelDto levelDto;
     private final PlayerDto playerDTO;
     private final PlayerRepository playerRepository;
@@ -57,17 +57,20 @@ public class PlayerServiceImpl implements PlayerService {
     public ApiResponse<PlayerModel> getPlayerById(Integer id) {
         ApiResponse<PlayerModel> result = new ApiResponse<>();
         result.setStatus(404);
-        result.setMessage("Not Found" + id );
+        result.setMessage("Not Found");
 
         try {
-            PlayerEntity character = playerRepository.findById(id).orElseThrow(() -> new NullPointerException("Player not found!" + id));
+            Optional<PlayerEntity> optionalPlayer = playerRepository.findById(id);
 
-            result.setStatus(200);
-            result.setMessage("OK");
-            result.setDescription("Successfully retrieved player information.");
-            result.setData(this.playerDTO.toDTO(character));
-        } catch (NullPointerException e) {
-            result.setDescription(e.getMessage());
+            if (optionalPlayer.isPresent()) {
+                PlayerEntity character = optionalPlayer.get();
+                result.setStatus(200);
+                result.setMessage("OK");
+                result.setDescription("Successfully retrieved player information.");
+                result.setData(this.playerDTO.toDTO(character));
+            } else {
+                result.setDescription("Player not found!");
+            }
         } catch (Exception e) {
             result.setStatus(500);
             result.setMessage("Internal Server Error");
@@ -76,6 +79,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         return result;
     }
+
 
     @Override
     public ApiResponse<PlayerModel> createPlayer(String name) {
@@ -91,8 +95,7 @@ public class PlayerServiceImpl implements PlayerService {
                     PlayerEntity character = new PlayerEntity();
                     character.setName(name);
                     PlayerEntity saved = this.playerRepository.save(character);
-                    String accountNumbers = generateRandomAccountNumber();
-                    this.accountUtils.createAccount(character, accountNumbers);
+                    this.accountDto.createAccount(character);
 
                     result.setStatus(201);
                     result.setMessage("Created");

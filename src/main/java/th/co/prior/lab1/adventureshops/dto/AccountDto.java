@@ -49,7 +49,7 @@ public class AccountDto {
         return accountRepository.findAccountByPlayerId(playerId).orElse(null);
     }
 
-    public void createAccount(PlayerEntity player, String accountNumbers) {
+    public void createAccount(PlayerEntity player) {
         AccountEntity account = new AccountEntity();
         account.setAccountNumber(generateAccountNumber());
         account.setBalance(5000.00);

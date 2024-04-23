@@ -30,17 +30,22 @@ public class PlayerDto {
                 .collect(Collectors.toList());
     }
 
-    public PlayerModel toDTO(PlayerEntity character){
+    public PlayerModel toDTO(PlayerEntity character) {
         PlayerModel dto = new PlayerModel();
         dto.setId(character.getId());
         dto.setName(character.getName());
-        dto.setLevel(Math.toIntExact(character.getLevelId()));
 
-        LevelEntity levelEntity = levelService.findById(Long.valueOf(character.getLevelId()));
-        if (levelEntity != null) {
+        // Check if the player's level ID is not null before converting
+        if (character.getLevelId() != null) {
+            dto.setLevel(Math.toIntExact(character.getLevelId()));
 
-            dto.setDamage(levelEntity.getDamage());
+            // Fetch the level entity only if the level ID is not null
+            LevelEntity levelEntity = levelService.findById(Long.valueOf(character.getLevelId()));
+            if (levelEntity != null) {
+                dto.setDamage(levelEntity.getDamage());
+            }
         }
+
         return dto;
     }
 

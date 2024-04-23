@@ -1,6 +1,8 @@
 package th.co.prior.lab1.adventureshops.service.implement;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import th.co.prior.lab1.adventureshops.dto.EntityDto;
@@ -29,6 +31,8 @@ public class MonsterServiceImpl implements MonsterService {
     private final PlayerDto playerDTO;
     private final InventoryDto inventoryDto;
     private final LevelService levelService;
+
+    private static final Logger logger = LoggerFactory.getLogger(MonsterServiceImpl.class);
 
 
     @Override
@@ -128,23 +132,30 @@ public class MonsterServiceImpl implements MonsterService {
             PlayerEntity player = playerDTO.findPlayerById(playerId);
             MonsterEntity monster = monsterDTO.findMonsterById(monsterId);
 
-            LevelEntity levelEntity = levelService.findById(Long.valueOf(player.getLevelId()));
-            int damage = levelEntity.getDamage();
+            if (player != null && monster != null) {
+                Integer levelId = player.getLevelId();
+                if (levelId != null) {
+                    LevelEntity levelEntity = levelService.findById(Long.valueOf(levelId));
+                    int damage = levelEntity.getDamage();
 
-            if (monster != null && player != null) {
-                if (monster.getHealth() <= damage) {
-                    inventoryDto.addInventory(monster.getItemDrop(), player.getId(), monster.getId());
+                    if (monster.getHealth() <= damage) {
+                        inventoryDto.addInventory(monster.getItemDrop(), player.getId(), monster.getId());
 
-                    result.setStatus(HttpStatus.OK.value());
-                    result.setMessage("OK");
-                    result.setDescription("You have successfully killed the " + monster.getName() +". You have received a " + monster.getItemDrop());
-                    result.setData(monsterDTO.toDTO(monster));
+                        result.setStatus(HttpStatus.OK.value());
+                        result.setMessage("OK");
+                        result.setDescription("You have successfully killed the " + monster.getName() +". You have received a " + monster.getItemDrop());
+                        result.setData(monsterDTO.toDTO(monster));
+                    } else {
+                        result.setStatus(HttpStatus.OK.value());
+                        result.setMessage("OK");
+                        result.setDescription("You have attacked " + monster.getName() + ". The monster's health is greater than your damage. Your damage is " + damage + ". Monster Health is " + monster.getHealth());
+                        result.setData(monsterDTO.toDTO(monster));
+                    }
                 } else {
-                    result.setStatus(HttpStatus.OK.value());
-                    result.setMessage("OK");
-                    result.setDescription("You have been killed by " + monster.getName() + ". Because the damage is not enough"
-                            + " Your damage is " + damage + " Monster Health is " + monster.getHealth());
-                    result.setData(monsterDTO.toDTO(monster));
+                    // Handle case where level ID is null
+                    result.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                    result.setMessage("Internal Server Error");
+                    result.setDescription("Player's level ID is null.");
                 }
             } else {
                 result.setStatus(HttpStatus.NOT_FOUND.value());
@@ -152,12 +163,20 @@ public class MonsterServiceImpl implements MonsterService {
                 result.setDescription("Player or monster not found.");
             }
         } catch (Exception e) {
+            // Log the exception
+            logger.error("An error occurred while attacking monster", e);
+
             result.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             result.setMessage("Internal Server Error");
             result.setDescription(e.getMessage());
         }
 
+        // Log the result
+        logger.info("Attack Monster Result: {}", result);
+
         return result;
     }
+
+
 
 }

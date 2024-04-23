@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: consumer-deployment
+  name: adventureshops-deployment
   namespace: dev
   labels:
-    app: consumer-label
+    app: adventureshops-label
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: consumer-deployment
+      app: adventureshops-deployment
   template:
     metadata:
       labels:
-        app: consumer-deployment
+        app: adventureshops-deployment
     spec:
       hostAliases:
         - ip: 127.0.0.1
@@ -23,22 +23,22 @@ spec:
           hostnames:
             - host.minikube.internal
       containers:
-      - name: consumer-deployment
-        image: consumer:1.0
-        imagePullPolicy: Never
+      - name: adventureshops-deployment
+        image: ion20155/adventureshops:1.0
+        imagePullPolicy: Always
         ports:
           - name: http
             containerPort: 8080
             protocol: TCP
         livenessProbe:
           httpGet:
-            path: /consumer/health/check
+            path: /adventureshops/health/check
             port: http
           failureThreshold: 3
           periodSeconds: 30
         readinessProbe:
           httpGet:
-            path: /consumer/health/check
+            path: /adventureshops/health/check
             port: http
           failureThreshold: 3
           periodSeconds: 30
@@ -46,16 +46,18 @@ spec:
         - name: JAVA_OPTS
           value: "-Xms256m -Xmx1024m"
         - name: SPRING_CONFIG
-          value: "/home/app/config/application.yml"
+          value: "--spring.config.location=/home/app/config/application.yaml"
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://host.minikube.internal:3306/adventure
         volumeMounts:
-        - name: consumer-volume
-          subPath: application-2.yaml
-          mountPath: /home/app/config/application.yml
-        - name: consumer-volume
+        - name: adventureshops-volume
+          subPath: application2.yaml
+          mountPath: /home/app/config/application.yaml
+        - name: adventureshops-volume
           subPath: mytestfile.txt
           mountPath: /home/app/config/mytestfile.txt
       volumes:
-      - name: consumer-volume
+      - name: adventureshops-volume
         configMap:
-          name: consumer-configmap
+          name: adventureshops-configmap
 

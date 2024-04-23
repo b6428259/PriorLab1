@@ -1,2 +1,2 @@
 eval $(minikube docker-env)
-docker build -t consumer:1.0 -f  Dockerfile-2stage
+docker build -t adventureshops:1.0 -f Dockerfile-2stage .

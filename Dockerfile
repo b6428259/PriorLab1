@@ -1,5 +1,5 @@
+# Build stage
 FROM maven:3.8.3-openjdk-17 AS build
-LABEL authors="thebi"
 
 RUN mkdir /home/app
 WORKDIR /home/app
@@ -10,13 +10,11 @@ RUN mvn dependency:resolve
 COPY ./src ./src
 RUN mvn clean package
 
-
-###BUILD IMAGE
+# Final stage
 FROM openjdk:17
-
-COPY --from=build target/*0.0.1-SNAPSHOT.jar /home/app/app.jar
-
+RUN mkdir /home/app
 WORKDIR /home/app
 
-ENTRYPOINT exec java -jar /home/app/app.jar
+COPY --from=build /home/app/target/adventureshops-0.0.1-SNAPSHOT.jar /home/app/app.jar
 
+ENTRYPOINT exec java -jar /home/app/app.jar

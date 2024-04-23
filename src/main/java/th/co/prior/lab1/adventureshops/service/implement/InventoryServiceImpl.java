@@ -14,7 +14,9 @@ import th.co.prior.lab1.adventureshops.model.InventoryModel;
 import th.co.prior.lab1.adventureshops.repository.InventoryRepository;
 import th.co.prior.lab1.adventureshops.service.InventoryService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -37,60 +39,35 @@ public class InventoryServiceImpl implements InventoryService {
         ApiResponse<List<InventoryEntity>> result = new ApiResponse<>();
         try {
             List<InventoryEntity> inventories = inventoryRepository.findAll();
-            if (!inventories.isEmpty()) {
+            if (inventories != null && !inventories.isEmpty()) {
                 result.setStatus(200);
                 result.setDescription("List of all Inventories retrieved successfully.");
                 result.setData(inventories);
             } else {
                 result.setStatus(404);
                 result.setDescription("No Inventories Found!");
+                // Ensure to set an empty list when no inventories are found
+                result.setData(Collections.emptyList());
             }
         } catch (Exception e) {
             result.setStatus(500);
             result.setDescription("Internal Server Error");
             LOGGER.error("Error fetching all inventories: {}", e.getMessage());
+            // Ensure to set an empty list when an exception occurs
+            result.setData(Collections.emptyList());
         }
         return result;
     }
 
-//    @Override
-//    public ApiResponse<InventoryModel> getInventoryByName(String name) {
-//        ApiResponse<InventoryModel> result = new ApiResponse<>();
-//        try {
-//            LOGGER.info("Searching for inventory by name: {}", name);
-//
-//            List<InventoryEntity> inventories = inventoryRepository.findByName(name);
-//
-//            if (!inventories.isEmpty()) {
-//                LOGGER.info("Found {} inventories with name: {}", inventories.size(), name);
-//                // Assuming you want to return the first inventory found
-//                InventoryEntity firstInventory = inventories.get(0);
-//                InventoryModel inventoryModel = this.inventoryDto.toDTO(firstInventory);
-//
-//                result.setStatus(200);
-//                result.setDescription("OK");
-//                result.setData(inventoryModel);
-//            } else {
-//                result.setStatus(404);
-//                result.setDescription("Inventory not found with name: " + name);
-//            }
-//        } catch (Exception e) {
-//            result.setStatus(500);
-//            result.setDescription("Internal Server Error");
-//            LOGGER.error("Error fetching inventory by name: {}", e.getMessage(), e);
-//        }
-//        return result;
-//    }
-//
 
 
     @Override
     public ApiResponse<InventoryModel> getInventoryById(Integer id) {
         ApiResponse<InventoryModel> result = new ApiResponse<>();
         try {
-            InventoryEntity inventory = inventoryRepository.findById(id)
-                    .orElse(null);
-            if (inventory != null) {
+            Optional<InventoryEntity> optionalInventory = inventoryRepository.findById(id);
+            if (optionalInventory.isPresent()) {
+                InventoryEntity inventory = optionalInventory.get();
                 result.setStatus(200);
                 result.setDescription("OK");
                 result.setData(this.inventoryDto.toDTO(inventory));
@@ -105,6 +82,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
         return result;
     }
+
 
     @Override
     public void addInventory(String name, Integer playerId, Integer monsterId) {

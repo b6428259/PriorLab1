@@ -30,7 +30,7 @@ public class InboxDto {
                 .collect(Collectors.toList());
     }
 
-    public InboxModel toDTO(InboxEntity inbox){
+    public InboxModel toDTO(InboxEntity inbox) {
         InboxModel dto = new InboxModel();
         dto.setId(inbox.getId());
         dto.setRecipient(inbox.getPlayer().getName());
@@ -39,11 +39,11 @@ public class InboxDto {
         return dto;
     }
 
-    public List<InboxEntity> findAllInbox(){
+    public List<InboxEntity> findAllInbox() {
         return inboxRepository.findAll();
     }
 
-    public InboxEntity findInboxById(Integer id){
+    public InboxEntity findInboxById(Integer id) {
         return inboxRepository.findById(id).orElse(null);
     }
 
@@ -51,7 +51,7 @@ public class InboxDto {
         try {
             PlayerEntity character = this.playerDTO.findPlayerById(id);
 
-            if(this.entityDTO.hasEntity(character)) {
+            if (this.entityDTO.hasEntity(character)) {
                 InboxEntity inbox = new InboxEntity();
                 inbox.setPlayer(character);
                 inbox.setMessage(message);
@@ -61,5 +61,6 @@ public class InboxDto {
             LOGGER.error("error: {}", e.getMessage());
         }
     }
+
 
 }

@@ -10,13 +10,8 @@ import th.co.prior.lab1.adventureshops.model.ApiResponse;
 import java.util.List;
 
 public interface AccountService {
-    ApiResponse<List<AccountEntity>> getAllAccounts();
-
-
-    ApiResponse<AccountModel> updateAccount(Integer id, double balance);
-
-
+    ApiResponse<List<AccountModel>> getAllAccounts();
     ApiResponse<AccountModel> getAccountById(Integer id);
-
+    ApiResponse<AccountModel> updateAccount(Integer id, double balance);
     ApiResponse<AccountModel> createAccount(Integer characterId, double balance);
 }

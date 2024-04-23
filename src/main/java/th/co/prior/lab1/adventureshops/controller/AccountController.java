@@ -21,8 +21,8 @@ public class AccountController {
     private final AccountServiceImpl accountService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AccountEntity>>> getAccount() {
-        ApiResponse<List<AccountEntity>> response = accountService.getAllAccounts();
+    public ResponseEntity<ApiResponse<List<AccountModel>>> getAccount() {
+        ApiResponse<List<AccountModel>> response = accountService.getAllAccounts();
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
