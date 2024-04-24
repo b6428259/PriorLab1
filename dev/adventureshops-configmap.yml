@@ -21,7 +21,7 @@ data:
         show-sql: false
       data:
         redis:
-          host: localhost
+          host: host.minikube.internal
           port: 6379
           password: superpassword  # Add the password here
     app:

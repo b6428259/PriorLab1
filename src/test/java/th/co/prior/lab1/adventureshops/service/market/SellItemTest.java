@@ -41,7 +41,7 @@ public class SellItemTest {
     private KafkaProducerComponent kafkaProducerComponent;
 
     @InjectMocks
-    private MarketPlaceServiceImpl marketplaceDto;
+    private MarketPlaceServiceImpl marketplaceImpl;
 
     @BeforeEach
     public void setUp() {
@@ -70,7 +70,7 @@ public class SellItemTest {
         when(marketDTO.toDTO(any())).thenReturn(new MarketPlaceModel()); // Changed to MarketPlaceModel
 
         // Act
-        ApiResponse<MarketPlaceModel> response = marketplaceDto.sellItem(playerId, itemId, price);
+        ApiResponse<MarketPlaceModel> response = marketplaceImpl.sellItem(playerId, itemId, price);
 
         // Assert
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
@@ -81,6 +81,46 @@ public class SellItemTest {
         verify(inboxDTO, times(1)).addInbox(playerId, "Your " + inventoryEntity.getName() + " has been added to the market.");
         verify(kafkaProducerComponent, times(1)).send("report-message", null, null, "Your " + inventoryEntity.getName() + " has been added to the market.");
     }
+
+    @Test
+    public void testSellItem_PlayerNotFound() {
+        // Arrange
+        Integer playerId = 1;
+        Integer itemId = 1;
+        double price = 10.0;
+
+        when(playerDTO.findPlayerById(playerId)).thenReturn(null);
+
+        // Act
+        ApiResponse<MarketPlaceModel> response = marketplaceImpl.sellItem(playerId, itemId, price);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals("Bad Request", response.getMessage());
+        assertEquals("Player not found with ID: " + playerId, response.getDescription());
+        assertNull(response.getData());
+    }
+
+    @Test
+    public void testSellItem_InventoryNotFound() {
+        // Arrange
+        Integer playerId = 1;
+        Integer itemId = 1;
+        double price = 10.0;
+
+        when(playerDTO.findPlayerById(playerId)).thenReturn(new PlayerEntity());
+        when(inventoryDTO.findInventoryById(itemId)).thenReturn(null);
+
+        // Act
+        ApiResponse<MarketPlaceModel> response = marketplaceImpl.sellItem(playerId, itemId, price);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals("Bad Request", response.getMessage());
+        assertEquals("Inventory item not found with ID: " + itemId, response.getDescription());
+        assertNull(response.getData());
+    }
+
 
     // Add more test cases for other scenarios (e.g., player not found, inventory not found, etc.)
 }

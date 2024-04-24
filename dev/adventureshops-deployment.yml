@@ -19,9 +19,6 @@ spec:
         - ip: 127.0.0.1
           hostnames:
             - localhost
-        - ip: 192.168.65.2
-          hostnames:
-            - host.minikube.internal
       containers:
       - name: adventureshops-deployment
         image: ion20155/adventureshops:1.0
